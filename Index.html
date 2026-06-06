@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cineteque</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c10;
+  --bg2:#141418;
+  --bg3:#1c1c22;
+  --gold:#f5c518;
+  --coral:#ff6b6b;
+  --mint:#4ecdc4;
+  --lavender:#c77dff;
+  --white:#f0ece0;
+  --gray:#999;
+  --gray2:#444;
+  --border:#252530;
+  --card-radius:16px;
+}
+html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;font-size:15px;overflow-x:hidden}
+
+/* GRAIN OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4}
+
+/* HEADER */
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:16px 24px 12px;position:sticky;top:0;z-index:100;box-shadow:0 4px 40px rgba(0,0,0,0.8)}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo-wrap{display:flex;flex-direction:column;gap:0}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--white);letter-spacing:6px;line-height:1;display:flex;align-items:center;gap:10px}
+.logo-dot{width:10px;height:10px;background:var(--coral);border-radius:50%;display:inline-block;margin-bottom:4px;box-shadow:0 0 14px var(--coral)}
+.logo-sub{font-size:0.68rem;letter-spacing:5px;text-transform:uppercase;color:var(--gray);font-weight:300;margin-top:2px}
+.tabs{display:flex;gap:6px}
+.tab-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.75rem;padding:6px 16px;border-radius:30px;cursor:pointer;transition:all 0.2s;letter-spacing:2px;text-transform:uppercase;font-weight:500}
+.tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
+.progress-wrap{margin-top:12px}
+.progress-info{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--gray);margin-bottom:5px;letter-spacing:0.5px}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--gold));border-radius:2px;transition:width 0.5s cubic-bezier(.4,0,.2,1)}
+
+/* FILTERS */
+.filters{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search-box{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.85rem;padding:9px 14px;border-radius:10px;outline:none;transition:border-color 0.2s}
+.search-box:focus{border-color:var(--gold)}
+.search-box::placeholder{color:var(--gray2)}
+.filter-select{background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.8rem;padding:9px 10px;border-radius:10px;outline:none;cursor:pointer}
+.filter-select option{background:var(--bg3)}
+.filter-btns{display:flex;gap:5px;flex-wrap:wrap}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.72rem;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase}
+.filter-btn.active{background:var(--mint);color:#000;border-color:var(--mint);font-weight:700}
+
+/* ACTIONS */
+.actions{display:flex;gap:7px;flex-wrap:wrap;padding:10px 24px;background:var(--bg);border-bottom:1px solid var(--border)}
+.action-btn{background:var(--bg3);border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.72rem;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;font-weight:500}
+.action-btn:hover{border-color:var(--gold);color:var(--gold)}
+.action-btn-random{border-color:var(--coral);color:var(--coral);font-weight:700}
+.action-btn-random:hover{background:var(--coral);color:#000}
+
+/* MAIN GRID */
+.main{padding:24px;max-width:1100px;margin:0 auto}
+.count-info{font-size:0.75rem;color:var(--gray);padding:0 0 16px;letter-spacing:1px;text-transform:uppercase}
+
+/* MOVIE GRID */
+.movie-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+
+/* MOVIE CARD */
+.movie-card{background:var(--bg2);border-radius:var(--card-radius);overflow:hidden;border:1px solid var(--border);transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative;cursor:pointer}
+.movie-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.6);border-color:var(--gray2)}
+.movie-card.watched{opacity:0.55}
+.movie-card.watched:hover{opacity:0.85}
+
+/* POSTER */
+.poster-wrap{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--bg3)}
+.poster-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s}
+.movie-card:hover .poster-img{transform:scale(1.04)}
+.poster-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;text-align:center}
+.poster-placeholder-year{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--border);letter-spacing:3px}
+.poster-placeholder-title{font-family:'Playfair Display',serif;font-size:0.75rem;color:var(--gray2);line-height:1.3;font-style:italic}
+.poster-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
+
+/* WATCHED OVERLAY */
+.watched-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.movie-card.watched .watched-overlay{opacity:1}
+.watched-check{font-size:2rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8))}
+
+/* ACCENT BAR — color by genre */
+.accent-bar{height:3px;width:100%}
+
+/* CARD BODY */
+.card-body{padding:12px}
+.card-title{font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:700;line-height:1.3;margin-bottom:4px;color:var(--white)}
+.card-dir{font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-weight:300}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tag{font-size:0.62rem;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;font-weight:600;text-transform:uppercase}
+.tag-year{background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid rgba(245,197,24,0.2)}
+.tag-country{background:rgba(78,205,196,0.12);color:var(--mint);border:1px solid rgba(78,205,196,0.2)}
+.tag-stream{background:rgba(255,107,107,0.12);color:var(--coral);border:1px solid rgba(255,107,107,0.2)}
+
+/* STARS in card */
+.card-stars{display:flex;gap:2px;margin-bottom:8px}
+.star{font-size:0.95rem;color:var(--gray2);cursor:pointer;transition:color 0.15s;min-width:20px;min-height:24px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.star.on{color:var(--gold)}
+
+/* CHECKBOX in card */
+.card-check-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.cb{width:20px;height:20px;border-radius:5px;border:2px solid var(--gray2);background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;position:relative;transition:all 0.2s;flex-shrink:0}
+.cb:checked{background:var(--mint);border-color:var(--mint)}
+.cb:checked::after{content:'';position:absolute;left:4px;top:1px;width:8px;height:11px;border:2px solid #000;border-top:none;border-left:none;transform:rotate(45deg)}
+.card-check-label{font-size:0.72rem;color:var(--gray);cursor:pointer;user-select:none}
+
+/* NOTE */
+.card-note{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.75rem;padding:7px 9px;border-radius:8px;resize:none;min-height:38px;outline:none;transition:border-color 0.2s;line-height:1.4;margin-top:8px}
+.card-note:focus{border-color:var(--gold)}
+.card-note::placeholder{color:var(--gray2)}
+
+/* CURIOUS FACT */
+.curious-btn{width:100%;background:transparent;border:1px dashed var(--border);color:var(--lavender);font-family:'Space Grotesk',sans-serif;font-size:0.7rem;padding:6px 10px;border-radius:8px;cursor:pointer;transition:all 0.2s;margin-top:6px;letter-spacing:0.5px;text-align:left;display:flex;align-items:center;gap:6px}
+.curious-btn:hover{border-color:var(--lavender);background:rgba(199,125,255,0.06)}
+.curious-btn.loading-fact{color:var(--gray);cursor:wait}
+.curious-fact{background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.2);border-radius:8px;padding:10px;margin-top:6px;font-size:0.75rem;line-height:1.5;color:var(--white);position:relative}
+.curious-fact-close{position:absolute;top:6px;right:8px;color:var(--gray);cursor:pointer;font-size:0.8rem;background:none;border:none;font-family:inherit;padding:0}
+.curious-fact-label{font-size:0.62rem;color:var(--lavender);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-weight:600}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:80px 20px;color:var(--gray);grid-column:1/-1}
+.empty-icon{font-size:3rem;margin-bottom:16px;display:block}
+
+/* ALERT */
+.alert{background:#1a0a0a;border:1px solid var(--coral);color:var(--coral);padding:12px 20px;margin:10px 24px;border-radius:10px;font-size:0.82rem;display:none}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:500px;width:100%}
+.modal h3{font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:1.4rem;color:var(--gold);margin-bottom:6px}
+.modal p{font-size:0.8rem;color:var(--gray);margin-bottom:14px}
+.modal textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.8rem;padding:10px;border-radius:10px;min-height:120px;outline:none;resize:vertical}
+.modal-btns{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+.btn-primary{background:var(--gold);color:#000;border:none;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;padding:9px 22px;border-radius:10px;cursor:pointer}
+.btn-secondary{background:transparent;color:var(--gray);border:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-size:0.85rem;padding:9px 22px;border-radius:10px;cursor:pointer}
+.btn-secondary:hover{color:var(--white)}
+
+/* RANDOM MODAL */
+.random-movie-display{display:grid;grid-template-columns:120px 1fr;gap:16px;margin:16px 0;align-items:start}
+.random-poster{width:120px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--bg3);flex-shrink:0}
+.random-poster img{width:100%;height:100%;object-fit:cover}
+.random-poster-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--border);letter-spacing:2px}
+.random-info{}
+.random-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--white);margin-bottom:4px;line-height:1.3;font-weight:700}
+.random-dir{font-size:0.78rem;color:var(--gray);margin-bottom:10px}
+.random-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.random-fact{background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.78rem;line-height:1.5;color:var(--white)}
+.random-fact-label{font-size:0.62rem;color:var(--lavender);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:600}
+.random-fact-loading{color:var(--gray);font-style:italic;font-size:0.78rem}
+/* SYNOPSIS */
+.synopsis-wrap{margin-top:8px}
+.synopsis-btn{width:100%;background:transparent;border:1px dashed var(--border);color:var(--mint);font-family:'Space Grotesk',sans-serif;font-size:0.7rem;padding:6px 10px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;text-align:left;display:flex;align-items:center;gap:6px}
+.synopsis-btn:hover{border-color:var(--mint);background:rgba(78,205,196,0.06)}
+.synopsis-text{background:rgba(78,205,196,0.07);border:1px solid rgba(78,205,196,0.18);border-radius:8px;padding:10px;margin-top:6px;font-size:0.76rem;line-height:1.6;color:var(--white);display:none}
+.synopsis-text.visible{display:block}
+.synopsis-label{font-size:0.6rem;color:var(--mint);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:600}
+.synopsis-loading{color:var(--gray);font-style:italic}
+/* RANDOM SYNOPSIS */
+.random-synopsis{background:rgba(78,205,196,0.07);border:1px solid rgba(78,205,196,0.18);border-radius:10px;padding:12px;margin-bottom:10px;font-size:0.78rem;line-height:1.6;color:var(--white)}
+.random-synopsis-label{font-size:0.62rem;color:var(--mint);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:600}
+.random-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-reroll{background:var(--bg3);color:var(--white);border:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-size:0.82rem;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:500}
+.btn-reroll:hover{border-color:var(--coral);color:var(--coral)}
+.random-check-row{display:flex;align-items:center;gap:8px}
+.random-remaining{font-size:0.68rem;color:var(--gray2);margin-top:10px;text-align:right;letter-spacing:0.5px}
+.no-random{color:var(--gray);text-align:center;padding:30px 0;font-size:0.9rem;line-height:1.8}
+
+/* GENRE COLOR ACCENTS */
+.accent-drama{background:linear-gradient(90deg,#c77dff,#9d4edd)}
+.accent-terror{background:linear-gradient(90deg,#ff6b6b,#ee3333)}
+.accent-doc{background:linear-gradient(90deg,#4ecdc4,#2ab5ac)}
+.accent-comedia{background:linear-gradient(90deg,#f5c518,#e6a817)}
+.accent-sci{background:linear-gradient(90deg,#74c0fc,#4dabf7)}
+.accent-accion{background:linear-gradient(90deg,#ff922b,#f76707)}
+.accent-romance{background:linear-gradient(90deg,#f783ac,#e64980)}
+.accent-mudo{background:linear-gradient(90deg,#868e96,#495057)}
+.accent-anime{background:linear-gradient(90deg,#63e6be,#20c997)}
+.accent-default{background:linear-gradient(90deg,#444,#333)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.movie-card{animation:fadeIn 0.3s ease both}
+
+@media(max-width:600px){
+  .movie-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+  .main{padding:16px}
+  .header{padding:12px 16px 10px}
+  .filters,.actions{padding:10px 16px}
+  .logo{font-size:1.9rem}
+  .random-movie-display{grid-template-columns:90px 1fr;gap:12px}
+  .random-poster{width:90px}
+}
+</style>
+</head>
+<body>
+
+<div id="ls-alert" class="alert">⚠ localStorage no disponible. Tu progreso NO se guardará.</div>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo-wrap">
+      <div class="logo"><span class="logo-dot"></span>CINETEQUE</div>
+      <div class="logo-sub">tu checklist de cine mundial</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(100)">Top 100</button>
+      <button class="tab-btn" onclick="switchTab(500)">Lista 500</button>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="prog-label">Cargando...</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="filters">
+  <input class="search-box" type="text" id="search-input" placeholder="Buscar título, director..." oninput="applyFilters()">
+  <select class="filter-select" id="filter-country" onchange="applyFilters()"><option value="">Todos los países</option></select>
+  <select class="filter-select" id="filter-decade" onchange="applyFilters()"><option value="">Todas las décadas</option></select>
+  <select class="filter-select" id="filter-genre" onchange="applyFilters()"><option value="">Todos los géneros</option></select>
+  <div class="filter-btns">
+    <button class="filter-btn active" id="btn-all" onclick="setStatusFilter('all')">Todas</button>
+    <button class="filter-btn" id="btn-seen" onclick="setStatusFilter('seen')">Vistas</button>
+    <button class="filter-btn" id="btn-unseen" onclick="setStatusFilter('unseen')">Por ver</button>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="action-btn action-btn-random" onclick="pickRandom()">🎲 Random</button>
+  <button class="action-btn" onclick="exportProgress()">↓ Exportar</button>
+  <button class="action-btn" onclick="openImportModal()">↑ Importar</button>
+  <button class="action-btn" onclick="clearAllProgress()">✕ Resetear</button>
+</div>
+
+<div class="main">
+  <div class="count-info" id="count-info"></div>
+  <div class="movie-grid" id="movie-list"></div>
+</div>
+
+<div class="modal-overlay" id="random-modal">
+  <div class="modal" style="max-width:560px">
+    <h3>Película Random</h3>
+    <p id="random-subtitle">Solo películas no vistas · respeta filtros activos</p>
+    <div id="random-result"></div>
+    <div class="modal-btns"><button class="btn-secondary" onclick="closeRandomModal()">Cerrar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <h3>Importar Progreso</h3>
+    <p>Pega el JSON exportado previamente:</p>
+    <textarea id="import-text" placeholder='{"watched":{},"ratings":{},"notes":{}}'></textarea>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeImportModal()">Cancelar</button>
+      <button class="btn-primary" onclick="doImport()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CINETEQUE v2 — Reglas: CERO backticks, CERO arrow functions
+   ============================================================ */
+
+var LS_KEY = 'cineteque_v1';
+var lsAvailable = false;
+var currentTab = 100;
+var statusFilter = 'all';
+var watched = {};
+var ratings = {};
+var notes = {};
+var posterCache = {};
+var synopsisCache = {};
+var lastRandomPool = [];
+
+/* ---- TEST localStorage ---- */
+try {
+  var testKey = '__cine_test__';
+  localStorage.setItem(testKey, '1');
+  localStorage.removeItem(testKey);
+  lsAvailable = true;
+} catch(e) {
+  lsAvailable = false;
+  document.getElementById('ls-alert').style.display = 'block';
+}
+
+var top100 = [
+  {id:'t1',title:'2001: A Space Odyssey',year:1968,dir:'Stanley Kubrick',country:'Reino Unido',genre:'Ciencia Ficción',stream:'Max'},
+  {id:'t2',title:'La Passion de Jeanne d\'Arc',year:1928,dir:'Carl Theodor Dreyer',country:'Francia',genre:'Drama / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t3',title:'Nosferatu, eine Symphonie des Grauens',year:1922,dir:'F.W. Murnau',country:'Alemania',genre:'Terror / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t4',title:'Battleship Potemkin',year:1925,dir:'Sergei Eisenstein',country:'URSS',genre:'Drama / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t5',title:'City Lights',year:1931,dir:'Charles Chaplin',country:'EE.UU.',genre:'Comedia / Drama',stream:'Max'},
+  {id:'t6',title:'Citizen Kane',year:1941,dir:'Orson Welles',country:'EE.UU.',genre:'Drama',stream:'Max'},
+  {id:'t7',title:'Tokyo Story',year:1953,dir:'Yasujiro Ozu',country:'Japón',genre:'Drama',stream:'MUBI'},
+  {id:'t8',title:'Seven Samurai',year:1954,dir:'Akira Kurosawa',country:'Japón',genre:'Acción / Drama',stream:'MUBI'},
+  {id:'t9',title:'La Dolce Vita',year:1960,dir:'Federico Fellini',country:'Italia',genre:'Drama',stream:'MUBI'},
+  {id:'t10',title:'8½',year:1963,dir:'Federico Fellini',country:'Italia',genre:'Drama',stream:'MUBI'},
+  {id:'t11',title:'Au revoir les enfants',year:1987,dir:'Louis Malle',country:'Francia',genre:'Drama / Guerra',stream:'MUBI'},
+  {id:'t12',title:'Aguirre, der Zorn Gottes',year:1972,dir:'Werner Herzog',country:'Alemania',genre:'Aventura / Drama',stream:'MUBI'},
+  {id:'t13',title:'Stalker',year:1979,dir:'Andrei Tarkovsky',country:'URSS',genre:'Ciencia Ficción / Drama',stream:'MUBI'},
+  {id:'t14',title:'The Rules of the Game',year:1939,dir:'Jean Renoir',country:'Francia',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'t15',title:'Bicycle Thieves',year:1948,dir:'Vittorio De Sica',country:'Italia',genre:'Drama',stream:'Max'},
+  {id:'t16',title:'Wild Strawberries',year:1957,dir:'Ingmar Bergman',country:'Suecia',genre:'Drama',stream:'MUBI'},
+  {id:'t17',title:'The Seventh Seal',year:1957,dir:'Ingmar Bergman',country:'Suecia',genre:'Drama / Fantasía',stream:'MUBI'},
+  {id:'t18',title:'Breathless (À bout de souffle)',year:1960,dir:'Jean-Luc Godard',country:'Francia',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'t19',title:'Apocalypse Now',year:1979,dir:'Francis Ford Coppola',country:'EE.UU.',genre:'Guerra / Drama',stream:'Netflix'},
+  {id:'t20',title:'Rashomon',year:1950,dir:'Akira Kurosawa',country:'Japón',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'t21',title:'Andrei Rublev',year:1966,dir:'Andrei Tarkovsky',country:'URSS',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'t22',title:'The Godfather',year:1972,dir:'Francis Ford Coppola',country:'EE.UU.',genre:'Drama / Crimen',stream:'Paramount+'},
+  {id:'t23',title:'Mulholland Drive',year:2001,dir:'David Lynch',country:'EE.UU.',genre:'Misterio / Drama',stream:'Max'},
+  {id:'t24',title:'Viridiana',year:1961,dir:'Luis Buñuel',country:'España / México',genre:'Drama',stream:'MUBI'},
+  {id:'t25',title:'Jeanne Dielman, 23 quai du Commerce',year:1975,dir:'Chantal Akerman',country:'Bélgica',genre:'Drama',stream:'Criterion'},
+  {id:'t26',title:'Mirror (Zerkalo)',year:1975,dir:'Andrei Tarkovsky',country:'URSS',genre:'Drama / Autobiográfico',stream:'MUBI'},
+  {id:'t27',title:'Satantango',year:1994,dir:'Béla Tarr',country:'Hungría',genre:'Drama',stream:'MUBI'},
+  {id:'t28',title:'Shoah',year:1985,dir:'Claude Lanzmann',country:'Francia',genre:'Documental',stream:'Criterion'},
+  {id:'t29',title:'Yi Yi',year:2000,dir:'Edward Yang',country:'Taiwán',genre:'Drama',stream:'Criterion'},
+  {id:'t30',title:'Close-Up',year:1990,dir:'Abbas Kiarostami',country:'Irán',genre:'Drama / Documental',stream:'Criterion'},
+  {id:'t31',title:'Pather Panchali',year:1955,dir:'Satyajit Ray',country:'India',genre:'Drama',stream:'Criterion'},
+  {id:'t32',title:'A Brighter Summer Day',year:1991,dir:'Edward Yang',country:'Taiwán',genre:'Drama / Crimen',stream:'Criterion'},
+  {id:'t33',title:'In the Mood for Love',year:2000,dir:'Wong Kar-wai',country:'Hong Kong',genre:'Drama / Romance',stream:'Max'},
+  {id:'t34',title:'Memories of Murder',year:2003,dir:'Bong Joon-ho',country:'Corea del Sur',genre:'Thriller / Crimen',stream:'Netflix'},
+  {id:'t35',title:'Parasite',year:2019,dir:'Bong Joon-ho',country:'Corea del Sur',genre:'Thriller / Drama',stream:'Max'},
+  {id:'t36',title:'Spirited Away',year:2001,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Fantasía',stream:'Max'},
+  {id:'t37',title:'Sátántangó',year:1994,dir:'Béla Tarr',country:'Hungría',genre:'Drama',stream:'MUBI'},
+  {id:'t38',title:'There Will Be Blood',year:2007,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Drama / Historia',stream:'Paramount+'},
+  {id:'t39',title:'The Tree of Life',year:2011,dir:'Terrence Malick',country:'EE.UU.',genre:'Drama / Experimental',stream:'Amazon Prime'},
+  {id:'t40',title:'Persona',year:1966,dir:'Ingmar Bergman',country:'Suecia',genre:'Drama / Psicológico',stream:'MUBI'},
+  {id:'t41',title:'Caché (Hidden)',year:2005,dir:'Michael Haneke',country:'Francia / Austria',genre:'Thriller / Drama',stream:'Netflix'},
+  {id:'t42',title:'The White Ribbon',year:2009,dir:'Michael Haneke',country:'Alemania',genre:'Drama / Misterio',stream:'MUBI'},
+  {id:'t43',title:'M (Eine Stadt sucht einen Mörder)',year:1931,dir:'Fritz Lang',country:'Alemania',genre:'Thriller / Crimen',stream:'MUBI'},
+  {id:'t44',title:'La Règle du jeu',year:1939,dir:'Jean Renoir',country:'Francia',genre:'Comedia / Drama',stream:'Criterion'},
+  {id:'t45',title:'A Separation',year:2011,dir:'Asghar Farhadi',country:'Irán',genre:'Drama',stream:'Amazon Prime'},
+  {id:'t46',title:'Blue is the Warmest Colour',year:2013,dir:'Abdellatif Kechiche',country:'Francia',genre:'Drama / Romance',stream:'Netflix'},
+  {id:'t47',title:'The Discreet Charm of the Bourgeoisie',year:1972,dir:'Luis Buñuel',country:'Francia',genre:'Comedia / Surrealismo',stream:'Criterion'},
+  {id:'t48',title:'Amarcord',year:1973,dir:'Federico Fellini',country:'Italia',genre:'Drama / Comedia',stream:'Criterion'},
+  {id:'t49',title:'L\'Avventura',year:1960,dir:'Michelangelo Antonioni',country:'Italia',genre:'Drama / Misterio',stream:'Criterion'},
+  {id:'t50',title:'Hiroshima mon amour',year:1959,dir:'Alain Resnais',country:'Francia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'t51',title:'Come and See',year:1985,dir:'Elem Klimov',country:'URSS',genre:'Guerra / Drama',stream:'MUBI'},
+  {id:'t52',title:'Grave of the Fireflies',year:1988,dir:'Isao Takahata',country:'Japón',genre:'Animación / Drama / Guerra',stream:'Max'},
+  {id:'t53',title:'Pan\'s Labyrinth',year:2006,dir:'Guillermo del Toro',country:'España / México',genre:'Fantasía / Drama',stream:'Max'},
+  {id:'t54',title:'The Battle of Algiers',year:1966,dir:'Gillo Pontecorvo',country:'Italia / Argelia',genre:'Drama / Guerra / Político',stream:'Criterion'},
+  {id:'t55',title:'Throne of Blood',year:1957,dir:'Akira Kurosawa',country:'Japón',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'t56',title:'Playtime',year:1967,dir:'Jacques Tati',country:'Francia',genre:'Comedia',stream:'Criterion'},
+  {id:'t57',title:'The Conformist',year:1970,dir:'Bernardo Bertolucci',country:'Italia',genre:'Drama / Político',stream:'MUBI'},
+  {id:'t58',title:'Chinatown',year:1974,dir:'Roman Polanski',country:'EE.UU.',genre:'Thriller / Neo-noir',stream:'Amazon Prime'},
+  {id:'t59',title:'Nashville',year:1975,dir:'Robert Altman',country:'EE.UU.',genre:'Drama / Musical',stream:'Paramount+'},
+  {id:'t60',title:'Barry Lyndon',year:1975,dir:'Stanley Kubrick',country:'Reino Unido',genre:'Drama / Histórico',stream:'Max'},
+  {id:'t61',title:'Fanny and Alexander',year:1982,dir:'Ingmar Bergman',country:'Suecia / Alemania',genre:'Drama / Familiar',stream:'Criterion'},
+  {id:'t62',title:'Blue Velvet',year:1986,dir:'David Lynch',country:'EE.UU.',genre:'Misterio / Thriller',stream:'MUBI'},
+  {id:'t63',title:'Trois couleurs: Bleu',year:1993,dir:'Krzysztof Kieślowski',country:'Francia / Polonia',genre:'Drama',stream:'MUBI'},
+  {id:'t64',title:'The Leopard',year:1963,dir:'Luchino Visconti',country:'Italia',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'t65',title:'L\'Atalante',year:1934,dir:'Jean Vigo',country:'Francia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'t66',title:'Ugetsu',year:1953,dir:'Kenji Mizoguchi',country:'Japón',genre:'Drama / Fantasía',stream:'Criterion'},
+  {id:'t67',title:'Sansho the Bailiff',year:1954,dir:'Kenji Mizoguchi',country:'Japón',genre:'Drama',stream:'Criterion'},
+  {id:'t68',title:'Late Spring',year:1949,dir:'Yasujiro Ozu',country:'Japón',genre:'Drama',stream:'Criterion'},
+  {id:'t69',title:'Sunrise: A Song of Two Humans',year:1927,dir:'F.W. Murnau',country:'EE.UU.',genre:'Drama / Romance / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t70',title:'Modern Times',year:1936,dir:'Charles Chaplin',country:'EE.UU.',genre:'Comedia / Drama',stream:'Max'},
+  {id:'t71',title:'Fitzcarraldo',year:1982,dir:'Werner Herzog',country:'Alemania',genre:'Aventura / Drama',stream:'MUBI'},
+  {id:'t72',title:'Sans Soleil',year:1983,dir:'Chris Marker',country:'Francia',genre:'Documental / Ensayo fílmico',stream:'YouTube'},
+  {id:'t73',title:'F for Fake',year:1973,dir:'Orson Welles',country:'Francia / Irán',genre:'Documental / Ensayo',stream:'Criterion'},
+  {id:'t74',title:'The Spirit of the Beehive',year:1973,dir:'Víctor Erice',country:'España',genre:'Drama',stream:'Criterion'},
+  {id:'t75',title:'Le Fabuleux Destin d\'Amélie Poulain',year:2001,dir:'Jean-Pierre Jeunet',country:'Francia',genre:'Comedia / Romance / Drama',stream:'Max'},
+  {id:'t76',title:'Cleo de 5 à 7',year:1962,dir:'Agnès Varda',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'t77',title:'Vagabond (Sans toit ni loi)',year:1985,dir:'Agnès Varda',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'t78',title:'Beau Travail',year:1999,dir:'Claire Denis',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'t79',title:'Mouchette',year:1967,dir:'Robert Bresson',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'t80',title:'Pickpocket',year:1959,dir:'Robert Bresson',country:'Francia',genre:'Drama / Crimen',stream:'Criterion'},
+  {id:'t81',title:'Winter Light',year:1963,dir:'Ingmar Bergman',country:'Suecia',genre:'Drama / Religión',stream:'Criterion'},
+  {id:'t82',title:'Autumn Sonata',year:1978,dir:'Ingmar Bergman',country:'Suecia / Alemania',genre:'Drama',stream:'Criterion'},
+  {id:'t83',title:'The Act of Killing',year:2012,dir:'Joshua Oppenheimer',country:'Dinamarca / Noruega / UK',genre:'Documental',stream:'MUBI'},
+  {id:'t84',title:'Shoah',year:1985,dir:'Claude Lanzmann',country:'Francia',genre:'Documental',stream:'Criterion'},
+  {id:'t85',title:'The General',year:1926,dir:'Buster Keaton',country:'EE.UU.',genre:'Comedia / Aventura / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t86',title:'Greed',year:1924,dir:'Erich von Stroheim',country:'EE.UU.',genre:'Drama / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t87',title:'Metropolis',year:1927,dir:'Fritz Lang',country:'Alemania',genre:'Ciencia Ficción / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'t88',title:'Sunset Blvd.',year:1950,dir:'Billy Wilder',country:'EE.UU.',genre:'Drama / Noir',stream:'Paramount+'},
+  {id:'t89',title:'Rear Window',year:1954,dir:'Alfred Hitchcock',country:'EE.UU.',genre:'Thriller / Misterio',stream:'Amazon Prime'},
+  {id:'t90',title:'Vertigo',year:1958,dir:'Alfred Hitchcock',country:'EE.UU.',genre:'Thriller / Misterio',stream:'Amazon Prime'},
+  {id:'t91',title:'Pierrot le fou',year:1965,dir:'Jean-Luc Godard',country:'Francia',genre:'Drama / Aventura',stream:'Criterion'},
+  {id:'t92',title:'The Master',year:2012,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Drama',stream:'Amazon Prime'},
+  {id:'t93',title:'Certified Copy',year:2010,dir:'Abbas Kiarostami',country:'Francia / Irán / Italia',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'t94',title:'A Woman Under the Influence',year:1974,dir:'John Cassavetes',country:'EE.UU.',genre:'Drama',stream:'Criterion'},
+  {id:'t95',title:'Umberto D.',year:1952,dir:'Vittorio De Sica',country:'Italia',genre:'Drama',stream:'Criterion'},
+  {id:'t96',title:'Rome, Open City',year:1945,dir:'Roberto Rossellini',country:'Italia',genre:'Drama / Guerra',stream:'Criterion'},
+  {id:'t97',title:'Her',year:2013,dir:'Spike Jonze',country:'EE.UU.',genre:'Drama / Romance / Ciencia Ficción',stream:'Max'},
+  {id:'t98',title:'The Gleaners and I',year:2000,dir:'Agnès Varda',country:'Francia',genre:'Documental',stream:'Criterion'},
+  {id:'t99',title:'The Turin Horse',year:2011,dir:'Béla Tarr',country:'Hungría',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'t100',title:'Moonlight',year:2016,dir:'Barry Jenkins',country:'EE.UU.',genre:'Drama',stream:'Netflix'}
+];
+
+
+/* ---- DATOS: LISTA 500 ---- */
+var list500 = [
+  /* LATINOAMÉRICA */
+  {id:'m1',title:'Amores Perros',year:2000,dir:'Alejandro González Iñárritu',country:'México',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m2',title:'Y Tu Mamá También',year:2001,dir:'Alfonso Cuarón',country:'México',genre:'Drama / Road Movie',stream:'Netflix'},
+  {id:'m3',title:'Roma',year:2018,dir:'Alfonso Cuarón',country:'México',genre:'Drama',stream:'Netflix'},
+  {id:'m4',title:'El Laberinto del Fauno',year:2006,dir:'Guillermo del Toro',country:'España / México',genre:'Fantasía / Drama',stream:'Max'},
+  {id:'m5',title:'El ángel exterminador',year:1962,dir:'Luis Buñuel',country:'México',genre:'Drama / Surrealismo',stream:'Criterion'},
+  {id:'m6',title:'Nostalgia de la luz',year:2010,dir:'Patricio Guzmán',country:'Chile / Francia',genre:'Documental',stream:'MUBI'},
+  {id:'m7',title:'La Batalla de Chile',year:1975,dir:'Patricio Guzmán',country:'Chile',genre:'Documental',stream:'YouTube'},
+  {id:'m8',title:'El abrazo de la serpiente',year:2015,dir:'Ciro Guerra',country:'Colombia',genre:'Drama / Aventura',stream:'Netflix'},
+  {id:'m9',title:'Pájaros de verano',year:2018,dir:'Ciro Guerra / Cristina Gallego',country:'Colombia',genre:'Drama / Crimen',stream:'Netflix'},
+  {id:'m10',title:'La Ciénaga',year:2001,dir:'Lucrecia Martel',country:'Argentina',genre:'Drama',stream:'MUBI'},
+  {id:'m11',title:'La mujer sin cabeza',year:2008,dir:'Lucrecia Martel',country:'Argentina',genre:'Drama / Misterio',stream:'MUBI'},
+  {id:'m12',title:'Zama',year:2017,dir:'Lucrecia Martel',country:'Argentina',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'m13',title:'Carancho',year:2010,dir:'Pablo Trapero',country:'Argentina',genre:'Thriller / Drama',stream:'MUBI'},
+  {id:'m14',title:'El secreto de sus ojos',year:2009,dir:'Juan José Campanella',country:'Argentina',genre:'Thriller / Drama',stream:'Netflix'},
+  {id:'m15',title:'Nueve Reinas',year:2000,dir:'Fabián Bielinsky',country:'Argentina',genre:'Thriller / Crimen',stream:'Amazon Prime'},
+  {id:'m16',title:'O Auto da Compadecida',year:2000,dir:'Guel Arraes',country:'Brasil',genre:'Comedia / Drama',stream:'Globoplay'},
+  {id:'m17',title:'City of God (Cidade de Deus)',year:2002,dir:'Fernando Meirelles',country:'Brasil',genre:'Drama / Crimen',stream:'Netflix'},
+  {id:'m18',title:'Central do Brasil',year:1998,dir:'Walter Salles',country:'Brasil',genre:'Drama',stream:'MUBI'},
+  {id:'m19',title:'Aquarius',year:2016,dir:'Kleber Mendonça Filho',country:'Brasil',genre:'Drama',stream:'MUBI'},
+  {id:'m20',title:'Bacurau',year:2019,dir:'Kleber Mendonça Filho',country:'Brasil',genre:'Drama / Western / Terror',stream:'MUBI'},
+  {id:'m21',title:'Terra em Transe',year:1967,dir:'Glauber Rocha',country:'Brasil',genre:'Drama / Político',stream:'YouTube'},
+  {id:'m22',title:'Deus e o Diabo na Terra do Sol',year:1964,dir:'Glauber Rocha',country:'Brasil',genre:'Drama / Western',stream:'Criterion'},
+  {id:'m23',title:'El Chacal de Nahueltoro',year:1969,dir:'Miguel Littin',country:'Chile',genre:'Drama / Crimen',stream:'YouTube'},
+  {id:'m24',title:'Azul y no tan Rosa',year:2012,dir:'Miguel Ferrari',country:'Venezuela',genre:'Drama / Romance',stream:'YouTube'},
+  {id:'m25',title:'Nuestro Mar',year:2017,dir:'Patricia Velásquez',country:'Venezuela',genre:'Documental',stream:'YouTube'},
+  {id:'m26',title:'Los Olvidados',year:1950,dir:'Luis Buñuel',country:'México',genre:'Drama',stream:'Criterion'},
+  {id:'m27',title:'Macario',year:1960,dir:'Roberto Gavaldón',country:'México',genre:'Drama / Fantasía',stream:'YouTube'},
+  {id:'m28',title:'Rojo amanecer',year:1989,dir:'Jorge Fons',country:'México',genre:'Drama / Político',stream:'YouTube'},
+  {id:'m29',title:'El Norte',year:1983,dir:'Gregory Nava',country:'EE.UU. / Guatemala',genre:'Drama',stream:'Criterion'},
+  {id:'m30',title:'Quinceañera',year:2006,dir:'Richard Glatzer',country:'EE.UU. / México',genre:'Drama',stream:'Amazon Prime'},
+
+  /* CINE PANAMEÑO Y CENTROAMERICANO */
+  {id:'m31',title:'Plaza Hueca',year:2013,dir:'Héctor Herrera',country:'Panamá',genre:'Drama',stream:'YouTube'},
+  {id:'m32',title:'Invasión',year:2014,dir:'Abner Benaim',country:'Panamá',genre:'Documental',stream:'Vimeo'},
+  {id:'m33',title:'A Veces Miro Mi Vida',year:2012,dir:'Arturo Montenegro',country:'Panamá',genre:'Documental',stream:'YouTube'},
+  {id:'m34',title:'Chance',year:2009,dir:'Abner Benaim',country:'Panamá',genre:'Drama',stream:'YouTube'},
+  {id:'m35',title:'El Enemigo',year:2015,dir:'Raúl Bustamante',country:'Panamá',genre:'Drama',stream:'YouTube'},
+  {id:'m36',title:'Ixcanul',year:2015,dir:'Jayro Bustamante',country:'Guatemala',genre:'Drama',stream:'MUBI'},
+  {id:'m37',title:'La Llorona',year:2019,dir:'Jayro Bustamante',country:'Guatemala',genre:'Terror / Drama',stream:'Shudder'},
+  {id:'m38',title:'El regreso',year:2011,dir:'Hernán Jiménez',country:'Costa Rica',genre:'Comedia / Drama',stream:'Netflix'},
+  {id:'m39',title:'Los salvajes',year:2012,dir:'Alejandro Landes',country:'Colombia / Argentina',genre:'Thriller / Drama',stream:'Amazon Prime'},
+
+  /* ASIA — JAPÓN */
+  {id:'m40',title:'Yojimbo',year:1961,dir:'Akira Kurosawa',country:'Japón',genre:'Acción / Drama',stream:'MUBI'},
+  {id:'m41',title:'Ikiru',year:1952,dir:'Akira Kurosawa',country:'Japón',genre:'Drama',stream:'Criterion'},
+  {id:'m42',title:'High and Low',year:1963,dir:'Akira Kurosawa',country:'Japón',genre:'Thriller / Crimen',stream:'Criterion'},
+  {id:'m43',title:'Harakiri',year:1962,dir:'Masaki Kobayashi',country:'Japón',genre:'Drama / Samurái',stream:'Criterion'},
+  {id:'m44',title:'Kwaidan',year:1964,dir:'Masaki Kobayashi',country:'Japón',genre:'Terror / Fantasía',stream:'Criterion'},
+  {id:'m45',title:'The Ballad of Narayama',year:1983,dir:'Shohei Imamura',country:'Japón',genre:'Drama',stream:'Criterion'},
+  {id:'m46',title:'Tampopo',year:1985,dir:'Juzo Itami',country:'Japón',genre:'Comedia / Drama',stream:'Criterion'},
+  {id:'m47',title:'Vengeance Is Mine',year:1979,dir:'Shohei Imamura',country:'Japón',genre:'Crimen / Drama',stream:'Criterion'},
+  {id:'m48',title:'Maborosi',year:1995,dir:'Hirokazu Koreeda',country:'Japón',genre:'Drama',stream:'MUBI'},
+  {id:'m49',title:'Nobody Knows',year:2004,dir:'Hirokazu Koreeda',country:'Japón',genre:'Drama',stream:'Criterion'},
+  {id:'m50',title:'Still Walking',year:2008,dir:'Hirokazu Koreeda',country:'Japón',genre:'Drama / Familiar',stream:'MUBI'},
+  {id:'m51',title:'Shoplifters',year:2018,dir:'Hirokazu Koreeda',country:'Japón',genre:'Drama / Crimen',stream:'Netflix'},
+  {id:'m52',title:'After Life',year:1998,dir:'Hirokazu Koreeda',country:'Japón',genre:'Drama / Fantasía',stream:'MUBI'},
+  {id:'m53',title:'Hana-Bi',year:1997,dir:'Takeshi Kitano',country:'Japón',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'m54',title:'Sonatine',year:1993,dir:'Takeshi Kitano',country:'Japón',genre:'Crimen / Drama',stream:'MUBI'},
+  {id:'m55',title:'Rurouni Kenshin',year:2012,dir:'Keishi Otomo',country:'Japón',genre:'Acción / Samurái',stream:'Netflix'},
+  {id:'m56',title:'Confessions',year:2010,dir:'Tetsuya Nakashima',country:'Japón',genre:'Thriller / Drama',stream:'MUBI'},
+  {id:'m57',title:'Love Exposure',year:2008,dir:'Sion Sono',country:'Japón',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'m58',title:'Oldboy',year:2003,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Misterio',stream:'Max'},
+  {id:'m59',title:'The Handmaiden',year:2016,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Romance',stream:'Amazon Prime'},
+  {id:'m60',title:'JSA: Joint Security Area',year:2000,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Drama',stream:'Amazon Prime'},
+
+  /* ASIA — CHINA / HONG KONG / TAIWÁN */
+  {id:'m61',title:'Chungking Express',year:1994,dir:'Wong Kar-wai',country:'Hong Kong',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m62',title:'Happy Together',year:1997,dir:'Wong Kar-wai',country:'Hong Kong',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m63',title:'Days of Being Wild',year:1990,dir:'Wong Kar-wai',country:'Hong Kong',genre:'Drama',stream:'Criterion'},
+  {id:'m64',title:'To Live',year:1994,dir:'Zhang Yimou',country:'China',genre:'Drama / Histórico',stream:'Amazon Prime'},
+  {id:'m65',title:'Raise the Red Lantern',year:1991,dir:'Zhang Yimou',country:'China',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m66',title:'Farewell My Concubine',year:1993,dir:'Chen Kaige',country:'China',genre:'Drama / Histórico',stream:'Amazon Prime'},
+  {id:'m67',title:'Spring, Summer, Fall, Winter... and Spring',year:2003,dir:'Kim Ki-duk',country:'Corea del Sur',genre:'Drama / Espiritual',stream:'MUBI'},
+  {id:'m68',title:'The Assassin',year:2015,dir:'Hou Hsiao-hsien',country:'Taiwán',genre:'Drama / Wuxia',stream:'MUBI'},
+  {id:'m69',title:'The Terrorizers',year:1986,dir:'Edward Yang',country:'Taiwán',genre:'Drama',stream:'Criterion'},
+  {id:'m70',title:'Flowers of Shanghai',year:1998,dir:'Hou Hsiao-hsien',country:'Taiwán',genre:'Drama / Período',stream:'Criterion'},
+
+  /* ASIA — INDIA / IRAN / OTROS */
+  {id:'m71',title:'Aparajito',year:1956,dir:'Satyajit Ray',country:'India',genre:'Drama',stream:'Criterion'},
+  {id:'m72',title:'The World of Apu',year:1959,dir:'Satyajit Ray',country:'India',genre:'Drama',stream:'Criterion'},
+  {id:'m73',title:'Devi',year:1960,dir:'Satyajit Ray',country:'India',genre:'Drama',stream:'Criterion'},
+  {id:'m74',title:'Mughal-E-Azam',year:1960,dir:'K. Asif',country:'India',genre:'Drama / Épico / Musical',stream:'Amazon Prime'},
+  {id:'m75',title:'Sholay',year:1975,dir:'Ramesh Sippy',country:'India',genre:'Acción / Western',stream:'Amazon Prime'},
+  {id:'m76',title:'Lagaan',year:2001,dir:'Ashutosh Gowariker',country:'India',genre:'Drama / Musical / Histórico',stream:'Amazon Prime'},
+  {id:'m77',title:'Where Is the Friend\'s Home?',year:1987,dir:'Abbas Kiarostami',country:'Irán',genre:'Drama',stream:'Criterion'},
+  {id:'m78',title:'Taste of Cherry',year:1997,dir:'Abbas Kiarostami',country:'Irán',genre:'Drama',stream:'Criterion'},
+  {id:'m79',title:'The Color of Paradise',year:1999,dir:'Majid Majidi',country:'Irán',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m80',title:'Ten',year:2002,dir:'Abbas Kiarostami',country:'Irán',genre:'Drama',stream:'MUBI'},
+  {id:'m81',title:'Offside',year:2006,dir:'Jafar Panahi',country:'Irán',genre:'Drama',stream:'MUBI'},
+  {id:'m82',title:'This Is Not a Film',year:2011,dir:'Jafar Panahi',country:'Irán',genre:'Documental / Experimental',stream:'MUBI'},
+  {id:'m83',title:'3 Faces',year:2018,dir:'Jafar Panahi',country:'Irán',genre:'Drama',stream:'MUBI'},
+  {id:'m84',title:'Leila',year:1996,dir:'Dariush Mehrjui',country:'Irán',genre:'Drama',stream:'YouTube'},
+  {id:'m85',title:'Uncle Boonmee Who Can Recall His Past Lives',year:2010,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama / Fantasía',stream:'MUBI'},
+  {id:'m86',title:'Tropical Malady',year:2004,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama / Misterio',stream:'MUBI'},
+  {id:'m87',title:'Manila in the Claws of Light',year:1975,dir:'Lino Brocka',country:'Filipinas',genre:'Drama',stream:'Criterion'},
+  {id:'m88',title:'In the Realm of the Senses',year:1976,dir:'Nagisa Oshima',country:'Japón / Francia',genre:'Drama / Erótico',stream:'Criterion'},
+
+  /* AFRICA Y MEDIO ORIENTE */
+  {id:'m89',title:'Xala',year:1975,dir:'Ousmane Sembène',country:'Senegal',genre:'Comedia / Sátira',stream:'Criterion'},
+  {id:'m90',title:'Moolaadé',year:2004,dir:'Ousmane Sembène',country:'Senegal / Francia',genre:'Drama / Social',stream:'Criterion'},
+  {id:'m91',title:'Yeelen',year:1987,dir:'Souleymane Cissé',country:'Mali',genre:'Drama / Fantasía',stream:'Criterion'},
+  {id:'m92',title:'Timbuktu',year:2014,dir:'Abderrahmane Sissako',country:'Mauritania / Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m93',title:'Bamako',year:2006,dir:'Abderrahmane Sissako',country:'Mali / Francia',genre:'Drama / Político',stream:'MUBI'},
+  {id:'m94',title:'Tsotsi',year:2005,dir:'Gavin Hood',country:'Sudáfrica',genre:'Drama / Crimen',stream:'Amazon Prime'},
+  {id:'m95',title:'Burn It Up Djinn',year:2013,dir:'Khaled Barakat',country:'Argelia',genre:'Drama',stream:'MUBI'},
+  {id:'m96',title:'Cairo Station',year:1958,dir:'Youssef Chahine',country:'Egipto',genre:'Drama / Thriller',stream:'Criterion'},
+  {id:'m97',title:'Destiny',year:1997,dir:'Youssef Chahine',country:'Egipto / Francia',genre:'Drama / Histórico',stream:'YouTube'},
+  {id:'m98',title:'Where Do We Go Now?',year:2011,dir:'Nadine Labaki',country:'Líbano / Francia',genre:'Drama / Comedia',stream:'Netflix'},
+  {id:'m99',title:'Capernaum',year:2018,dir:'Nadine Labaki',country:'Líbano',genre:'Drama',stream:'Netflix'},
+  {id:'m100',title:'Waltz with Bashir',year:2008,dir:'Ari Folman',country:'Israel',genre:'Documental / Animación',stream:'MUBI'},
+
+  /* EUROPA — CLÁSICOS Y NUEVAS OLAS */
+  {id:'m101',title:'Jules and Jim',year:1962,dir:'François Truffaut',country:'Francia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m102',title:'The 400 Blows',year:1959,dir:'François Truffaut',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'m103',title:'Band of Outsiders',year:1964,dir:'Jean-Luc Godard',country:'Francia',genre:'Crimen / Drama',stream:'Criterion'},
+  {id:'m104',title:'My Night at Maud\'s',year:1969,dir:'Éric Rohmer',country:'Francia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m105',title:'Claire\'s Knee',year:1970,dir:'Éric Rohmer',country:'Francia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m106',title:'The Umbrellas of Cherbourg',year:1964,dir:'Jacques Demy',country:'Francia',genre:'Musical / Romance',stream:'Criterion'},
+  {id:'m107',title:'L\'Eclisse',year:1962,dir:'Michelangelo Antonioni',country:'Italia',genre:'Drama',stream:'Criterion'},
+  {id:'m108',title:'Blow-Up',year:1966,dir:'Michelangelo Antonioni',country:'UK / Italia',genre:'Misterio / Drama',stream:'MUBI'},
+  {id:'m109',title:'The Passenger',year:1975,dir:'Michelangelo Antonioni',country:'Italia / España',genre:'Thriller / Drama',stream:'Criterion'},
+  {id:'m110',title:'Germany Year Zero',year:1948,dir:'Roberto Rossellini',country:'Italia / Alemania',genre:'Drama / Guerra',stream:'Criterion'},
+  {id:'m111',title:'Stromboli',year:1950,dir:'Roberto Rossellini',country:'Italia',genre:'Drama',stream:'Criterion'},
+  {id:'m112',title:'Il Generale della Rovere',year:1959,dir:'Roberto Rossellini',country:'Italia',genre:'Drama / Guerra',stream:'Criterion'},
+  {id:'m113',title:'The Great Dictator',year:1940,dir:'Charles Chaplin',country:'EE.UU.',genre:'Comedia / Político',stream:'YouTube'},
+  {id:'m114',title:'Limelight',year:1952,dir:'Charles Chaplin',country:'EE.UU.',genre:'Drama / Comedia',stream:'Max'},
+  {id:'m115',title:'The Earrings of Madame de...',year:1953,dir:'Max Ophüls',country:'Francia / Italia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m116',title:'La Ronde',year:1950,dir:'Max Ophüls',country:'Francia',genre:'Drama / Comedia / Romance',stream:'Criterion'},
+  {id:'m117',title:'Letter from an Unknown Woman',year:1948,dir:'Max Ophüls',country:'EE.UU.',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m118',title:'Lola Montès',year:1955,dir:'Max Ophüls',country:'Francia / Alemania',genre:'Drama / Biográfico',stream:'Criterion'},
+  {id:'m119',title:'Ivan the Terrible, Part I',year:1944,dir:'Sergei Eisenstein',country:'URSS',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'m120',title:'Alexander Nevsky',year:1938,dir:'Sergei Eisenstein',country:'URSS',genre:'Drama / Histórico / Guerra',stream:'YouTube'},
+  {id:'m121',title:'The Cranes Are Flying',year:1957,dir:'Mikhail Kalatozov',country:'URSS',genre:'Drama / Romance / Guerra',stream:'Criterion'},
+  {id:'m122',title:'I Am Cuba',year:1964,dir:'Mikhail Kalatozov',country:'URSS / Cuba',genre:'Drama / Político',stream:'Criterion'},
+  {id:'m123',title:'Solaris',year:1972,dir:'Andrei Tarkovsky',country:'URSS',genre:'Ciencia Ficción / Drama',stream:'Criterion'},
+  {id:'m124',title:'The Sacrifice',year:1986,dir:'Andrei Tarkovsky',country:'Suecia / Francia',genre:'Drama / Experimental',stream:'Criterion'},
+  {id:'m125',title:'Wings of Desire',year:1987,dir:'Wim Wenders',country:'Alemania Occ.',genre:'Drama / Fantasía',stream:'Criterion'},
+  {id:'m126',title:'Paris, Texas',year:1984,dir:'Wim Wenders',country:'Alemania / Francia',genre:'Drama',stream:'Criterion'},
+  {id:'m127',title:'The American Friend',year:1977,dir:'Wim Wenders',country:'Alemania / Francia',genre:'Thriller / Noir',stream:'Criterion'},
+  {id:'m128',title:'Kings of the Road',year:1976,dir:'Wim Wenders',country:'Alemania Occ.',genre:'Drama / Road Movie',stream:'Criterion'},
+  {id:'m129',title:'Ali: Fear Eats the Soul',year:1974,dir:'Rainer Werner Fassbinder',country:'Alemania',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m130',title:'The Marriage of Maria Braun',year:1979,dir:'Rainer Werner Fassbinder',country:'Alemania',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'m131',title:'In a Year of 13 Moons',year:1978,dir:'Rainer Werner Fassbinder',country:'Alemania',genre:'Drama',stream:'Criterion'},
+  {id:'m132',title:'The Tin Drum',year:1979,dir:'Volker Schlöndorff',country:'Alemania',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'m133',title:'Damnation',year:1988,dir:'Béla Tarr',country:'Hungría',genre:'Drama',stream:'MUBI'},
+  {id:'m134',title:'Werckmeister Harmonies',year:2000,dir:'Béla Tarr',country:'Hungría',genre:'Drama / Misterio',stream:'Criterion'},
+  {id:'m135',title:'Marketa Lazarová',year:1967,dir:'František Vláčil',country:'Checoslovaquia',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'m136',title:'Closely Watched Trains',year:1966,dir:'Jiří Menzel',country:'Checoslovaquia',genre:'Comedia / Drama / Guerra',stream:'Criterion'},
+  {id:'m137',title:'Daisies',year:1966,dir:'Věra Chytilová',country:'Checoslovaquia',genre:'Comedia / Experimental',stream:'Criterion'},
+  {id:'m138',title:'The Shop on Main Street',year:1965,dir:'Ján Kadár / Elmar Klos',country:'Checoslovaquia',genre:'Drama / Guerra',stream:'Criterion'},
+  {id:'m139',title:'The Firemen\'s Ball',year:1967,dir:'Milos Forman',country:'Checoslovaquia',genre:'Comedia / Sátira',stream:'Criterion'},
+  {id:'m140',title:'Short Film About Killing',year:1988,dir:'Krzysztof Kieślowski',country:'Polonia',genre:'Thriller / Drama',stream:'Criterion'},
+  {id:'m141',title:'Short Film About Love',year:1988,dir:'Krzysztof Kieślowski',country:'Polonia',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m142',title:'The Double Life of Véronique',year:1991,dir:'Krzysztof Kieślowski',country:'Francia / Polonia',genre:'Drama / Misterio',stream:'Criterion'},
+  {id:'m143',title:'Dekalog',year:1988,dir:'Krzysztof Kieślowski',country:'Polonia',genre:'Drama / Serie TV',stream:'Criterion'},
+  {id:'m144',title:'Knife in the Water',year:1962,dir:'Roman Polanski',country:'Polonia',genre:'Thriller / Drama',stream:'Criterion'},
+  {id:'m145',title:'Ida',year:2013,dir:'Paweł Pawlikowski',country:'Polonia',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'m146',title:'Cold War',year:2018,dir:'Paweł Pawlikowski',country:'Polonia',genre:'Drama / Romance',stream:'Amazon Prime'},
+  {id:'m147',title:'Amour',year:2012,dir:'Michael Haneke',country:'Austria / Francia',genre:'Drama',stream:'Netflix'},
+  {id:'m148',title:'Funny Games',year:1997,dir:'Michael Haneke',country:'Austria',genre:'Thriller / Terror',stream:'MUBI'},
+  {id:'m149',title:'Benny\'s Video',year:1992,dir:'Michael Haneke',country:'Austria',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m150',title:'Welfare',year:1975,dir:'Frederick Wiseman',country:'EE.UU.',genre:'Documental',stream:'Zipporah Films'},
+
+  /* DIRECTORAS */
+  {id:'m151',title:'The Piano',year:1993,dir:'Jane Campion',country:'Nueva Zelanda / Australia',genre:'Drama / Romance',stream:'Max'},
+  {id:'m152',title:'Bright Star',year:2009,dir:'Jane Campion',country:'UK / Australia',genre:'Drama / Biográfico / Romance',stream:'Amazon Prime'},
+  {id:'m153',title:'Ratcatcher',year:1999,dir:'Lynne Ramsay',country:'UK',genre:'Drama',stream:'MUBI'},
+  {id:'m154',title:'We Need to Talk About Kevin',year:2011,dir:'Lynne Ramsay',country:'UK',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m155',title:'You Were Never Really Here',year:2017,dir:'Lynne Ramsay',country:'UK / Francia',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m156',title:'Lost in Translation',year:2003,dir:'Sofia Coppola',country:'EE.UU. / Japón',genre:'Drama / Romance',stream:'Max'},
+  {id:'m157',title:'The Virgin Suicides',year:1999,dir:'Sofia Coppola',country:'EE.UU.',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m158',title:'Marie Antoinette',year:2006,dir:'Sofia Coppola',country:'EE.UU. / Francia',genre:'Drama / Biográfico',stream:'Netflix'},
+  {id:'m159',title:'Priscilla',year:2023,dir:'Sofia Coppola',country:'EE.UU.',genre:'Drama / Biográfico',stream:'Amazon Prime'},
+  {id:'m160',title:'Fish Tank',year:2009,dir:'Andrea Arnold',country:'UK',genre:'Drama',stream:'MUBI'},
+  {id:'m161',title:'American Honey',year:2016,dir:'Andrea Arnold',country:'UK / EE.UU.',genre:'Drama / Road Movie',stream:'Amazon Prime'},
+  {id:'m162',title:'Wuthering Heights',year:2011,dir:'Andrea Arnold',country:'UK',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m163',title:'Portrait of a Lady on Fire',year:2019,dir:'Céline Sciamma',country:'Francia',genre:'Drama / Romance / Histórico',stream:'Netflix'},
+  {id:'m164',title:'Girlhood',year:2014,dir:'Céline Sciamma',country:'Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m165',title:'Water Lilies',year:2007,dir:'Céline Sciamma',country:'Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m166',title:'Tomboy',year:2011,dir:'Céline Sciamma',country:'Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m167',title:'35 Shots of Rum',year:2008,dir:'Claire Denis',country:'Francia',genre:'Drama',stream:'Criterion'},
+  {id:'m168',title:'Trouble Every Day',year:2001,dir:'Claire Denis',country:'Francia',genre:'Horror / Drama',stream:'MUBI'},
+  {id:'m169',title:'Chocolat',year:1988,dir:'Claire Denis',country:'Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m170',title:'I Can\'t Sleep',year:1994,dir:'Claire Denis',country:'Francia',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'m171',title:'Babette\'s Feast',year:1987,dir:'Gabriel Axel',country:'Dinamarca',genre:'Drama / Gastronomía',stream:'Criterion'},
+  {id:'m172',title:'Dheepan',year:2015,dir:'Jacques Audiard',country:'Francia / Sri Lanka',genre:'Drama',stream:'Netflix'},
+  {id:'m173',title:'A Prophet',year:2009,dir:'Jacques Audiard',country:'Francia',genre:'Drama / Crimen',stream:'Netflix'},
+  {id:'m174',title:'Head-On',year:2004,dir:'Fatih Akin',country:'Alemania / Turquía',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m175',title:'In July',year:2000,dir:'Fatih Akin',country:'Alemania',genre:'Comedia / Road Movie',stream:'MUBI'},
+  {id:'m176',title:'The Edge of Heaven',year:2007,dir:'Fatih Akin',country:'Alemania / Turquía',genre:'Drama',stream:'MUBI'},
+  {id:'m177',title:'Mustang',year:2015,dir:'Deniz Gamze Ergüven',country:'Francia / Turquía',genre:'Drama',stream:'Netflix'},
+  {id:'m178',title:'Winter Sleep',year:2014,dir:'Nuri Bilge Ceylan',country:'Turquía',genre:'Drama',stream:'MUBI'},
+  {id:'m179',title:'Once Upon a Time in Anatolia',year:2011,dir:'Nuri Bilge Ceylan',country:'Turquía / Bosnia',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m180',title:'Distant',year:2002,dir:'Nuri Bilge Ceylan',country:'Turquía',genre:'Drama',stream:'MUBI'},
+
+  /* DOCUMENTALES */
+  {id:'m181',title:'Man with a Movie Camera',year:1929,dir:'Dziga Vertov',country:'URSS',genre:'Documental / Experimental',stream:'YouTube (dominio público)'},
+  {id:'m182',title:'Grey Gardens',year:1975,dir:'Albert / David Maysles',country:'EE.UU.',genre:'Documental',stream:'Max'},
+  {id:'m183',title:'Harlan County, USA',year:1976,dir:'Barbara Kopple',country:'EE.UU.',genre:'Documental',stream:'Criterion'},
+  {id:'m184',title:'The Thin Blue Line',year:1988,dir:'Errol Morris',country:'EE.UU.',genre:'Documental',stream:'Amazon Prime'},
+  {id:'m185',title:'Roger & Me',year:1989,dir:'Michael Moore',country:'EE.UU.',genre:'Documental',stream:'Max'},
+  {id:'m186',title:'Hoop Dreams',year:1994,dir:'Steve James',country:'EE.UU.',genre:'Documental',stream:'Criterion'},
+  {id:'m187',title:'Capturing the Friedmans',year:2003,dir:'Andrew Jarecki',country:'EE.UU.',genre:'Documental',stream:'Max'},
+  {id:'m188',title:'Samsara',year:2011,dir:'Ron Fricke',country:'EE.UU.',genre:'Documental / Visual',stream:'Amazon Prime'},
+  {id:'m189',title:'The Look of Silence',year:2014,dir:'Joshua Oppenheimer',country:'Dinamarca / Indonesia',genre:'Documental',stream:'MUBI'},
+  {id:'m190',title:'Stories We Tell',year:2012,dir:'Sarah Polley',country:'Canadá',genre:'Documental',stream:'MUBI'},
+  {id:'m191',title:'I, Daniel Blake',year:2016,dir:'Ken Loach',country:'UK / Francia',genre:'Drama / Social',stream:'Amazon Prime'},
+  {id:'m192',title:'The Navigators',year:2001,dir:'Ken Loach',country:'UK',genre:'Drama / Social',stream:'MUBI'},
+  {id:'m193',title:'Jiro Dreams of Sushi',year:2011,dir:'David Gelb',country:'EE.UU.',genre:'Documental / Gastronomía',stream:'Netflix'},
+  {id:'m194',title:'13th',year:2016,dir:'Ava DuVernay',country:'EE.UU.',genre:'Documental',stream:'Netflix'},
+  {id:'m195',title:'I Am Not Your Negro',year:2016,dir:'Raoul Peck',country:'Francia / Haití',genre:'Documental',stream:'Amazon Prime'},
+  {id:'m196',title:'Tongues Untied',year:1989,dir:'Marlon Riggs',country:'EE.UU.',genre:'Documental / Experimental',stream:'Criterion'},
+  {id:'m197',title:'Drunktown\'s Finest',year:2014,dir:'Sydney Freeland',country:'EE.UU.',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m198',title:'Watunna: A Portrait of the Rainforest',year:2009,dir:'Varios',country:'Venezuela',genre:'Documental',stream:'YouTube'},
+  {id:'m199',title:'The Truffle Hunters',year:2020,dir:'Michael Dweck / Gregory Kershaw',country:'EE.UU.',genre:'Documental',stream:'Amazon Prime'},
+  {id:'m200',title:'Fire at Sea',year:2016,dir:'Gianfranco Rosi',country:'Italia',genre:'Documental',stream:'MUBI'},
+
+  /* GÉNERO — HORROR */
+  {id:'m201',title:'Suspiria',year:1977,dir:'Dario Argento',country:'Italia',genre:'Terror',stream:'Shudder'},
+  {id:'m202',title:'Rosemary\'s Baby',year:1968,dir:'Roman Polanski',country:'EE.UU.',genre:'Terror / Drama',stream:'Amazon Prime'},
+  {id:'m203',title:'The Wicker Man',year:1973,dir:'Robin Hardy',country:'UK',genre:'Terror / Misterio',stream:'Shudder'},
+  {id:'m204',title:'Possessor',year:2020,dir:'Brandon Cronenberg',country:'Canadá',genre:'Terror / Ciencia Ficción',stream:'Shudder'},
+  {id:'m205',title:'Hereditary',year:2018,dir:'Ari Aster',country:'EE.UU.',genre:'Terror / Drama',stream:'Amazon Prime'},
+  {id:'m206',title:'Midsommar',year:2019,dir:'Ari Aster',country:'EE.UU. / Suecia',genre:'Terror / Drama',stream:'Amazon Prime'},
+  {id:'m207',title:'The Witch',year:2015,dir:'Robert Eggers',country:'EE.UU.',genre:'Terror / Histórico',stream:'Amazon Prime'},
+  {id:'m208',title:'The Lighthouse',year:2019,dir:'Robert Eggers',country:'EE.UU.',genre:'Terror / Drama',stream:'Amazon Prime'},
+  {id:'m209',title:'His House',year:2020,dir:'Remi Weekes',country:'UK',genre:'Terror / Drama',stream:'Netflix'},
+  {id:'m210',title:'Raw',year:2016,dir:'Julia Ducournau',country:'Francia / Bélgica',genre:'Terror / Drama',stream:'MUBI'},
+
+  /* GÉNERO — WESTERN Y ACCIÓN */
+  {id:'m211',title:'The Good, the Bad and the Ugly',year:1966,dir:'Sergio Leone',country:'Italia / España',genre:'Western',stream:'Amazon Prime'},
+  {id:'m212',title:'Once Upon a Time in the West',year:1968,dir:'Sergio Leone',country:'Italia / EE.UU.',genre:'Western',stream:'Amazon Prime'},
+  {id:'m213',title:'Once Upon a Time in America',year:1984,dir:'Sergio Leone',country:'EE.UU. / Italia',genre:'Drama / Crimen',stream:'Amazon Prime'},
+  {id:'m214',title:'Man Hunt',year:1941,dir:'Fritz Lang',country:'EE.UU.',genre:'Thriller / Guerra',stream:'YouTube'},
+  {id:'m215',title:'Stagecoach',year:1939,dir:'John Ford',country:'EE.UU.',genre:'Western',stream:'Amazon Prime'},
+  {id:'m216',title:'The Searchers',year:1956,dir:'John Ford',country:'EE.UU.',genre:'Western',stream:'Max'},
+  {id:'m217',title:'Shane',year:1953,dir:'George Stevens',country:'EE.UU.',genre:'Western',stream:'Amazon Prime'},
+  {id:'m218',title:'Unforgiven',year:1992,dir:'Clint Eastwood',country:'EE.UU.',genre:'Western',stream:'Max'},
+  {id:'m219',title:'Django',year:1966,dir:'Sergio Corbucci',country:'Italia',genre:'Spaghetti Western',stream:'Amazon Prime'},
+  {id:'m220',title:'The Wild Bunch',year:1969,dir:'Sam Peckinpah',country:'EE.UU.',genre:'Western / Acción',stream:'Max'},
+
+  /* GÉNERO — CIENCIA FICCIÓN Y FANTASÍA */
+  {id:'m221',title:'Metropolis',year:1927,dir:'Fritz Lang',country:'Alemania',genre:'Ciencia Ficción / Cine Mudo',stream:'YouTube (dominio público)'},
+  {id:'m222',title:'Blade Runner',year:1982,dir:'Ridley Scott',country:'EE.UU.',genre:'Ciencia Ficción / Noir',stream:'Amazon Prime'},
+  {id:'m223',title:'Brazil',year:1985,dir:'Terry Gilliam',country:'UK',genre:'Ciencia Ficción / Sátira',stream:'Amazon Prime'},
+  {id:'m224',title:'La Jetée',year:1962,dir:'Chris Marker',country:'Francia',genre:'Ciencia Ficción / Experimental',stream:'Criterion'},
+  {id:'m225',title:'Videodrome',year:1983,dir:'David Cronenberg',country:'Canadá',genre:'Ciencia Ficción / Horror',stream:'Shudder'},
+  {id:'m226',title:'eXistenZ',year:1999,dir:'David Cronenberg',country:'Canadá',genre:'Ciencia Ficción / Thriller',stream:'Amazon Prime'},
+  {id:'m227',title:'Being John Malkovich',year:1999,dir:'Spike Jonze',country:'EE.UU.',genre:'Comedia / Fantasía',stream:'Netflix'},
+  {id:'m228',title:'Eternal Sunshine of the Spotless Mind',year:2004,dir:'Michel Gondry',country:'EE.UU.',genre:'Drama / Ciencia Ficción',stream:'Max'},
+  {id:'m229',title:'Primer',year:2004,dir:'Shane Carruth',country:'EE.UU.',genre:'Ciencia Ficción / Thriller',stream:'Amazon Prime'},
+  {id:'m230',title:'Moon',year:2009,dir:'Duncan Jones',country:'UK',genre:'Ciencia Ficción / Drama',stream:'Amazon Prime'},
+
+  /* GÉNERO — COMEDIA Y ABSURDO */
+  {id:'m231',title:'Dr. Strangelove',year:1964,dir:'Stanley Kubrick',country:'UK / EE.UU.',genre:'Comedia / Sátira',stream:'Max'},
+  {id:'m232',title:'MASH',year:1970,dir:'Robert Altman',country:'EE.UU.',genre:'Comedia / Guerra',stream:'Max'},
+  {id:'m233',title:'Monty Python\'s Life of Brian',year:1979,dir:'Terry Jones',country:'UK',genre:'Comedia / Sátira',stream:'Amazon Prime'},
+  {id:'m234',title:'Annie Hall',year:1977,dir:'Woody Allen',country:'EE.UU.',genre:'Comedia / Romance',stream:'Max'},
+  {id:'m235',title:'Manhattan',year:1979,dir:'Woody Allen',country:'EE.UU.',genre:'Comedia / Drama',stream:'Max'},
+  {id:'m236',title:'His Girl Friday',year:1940,dir:'Howard Hawks',country:'EE.UU.',genre:'Comedia / Drama / Periodismo',stream:'YouTube (dominio público)'},
+  {id:'m237',title:'The Apartment',year:1960,dir:'Billy Wilder',country:'EE.UU.',genre:'Comedia / Drama',stream:'Amazon Prime'},
+  {id:'m238',title:'Ace in the Hole',year:1951,dir:'Billy Wilder',country:'EE.UU.',genre:'Drama / Sátira',stream:'Criterion'},
+  {id:'m239',title:'The Palm Beach Story',year:1942,dir:'Preston Sturges',country:'EE.UU.',genre:'Comedia',stream:'Criterion'},
+  {id:'m240',title:'Sullivan\'s Travels',year:1941,dir:'Preston Sturges',country:'EE.UU.',genre:'Comedia / Drama',stream:'Criterion'},
+
+  /* GÉNERO — CRIMEN Y NOIR */
+  {id:'m241',title:'Double Indemnity',year:1944,dir:'Billy Wilder',country:'EE.UU.',genre:'Noir / Thriller',stream:'Amazon Prime'},
+  {id:'m242',title:'Laura',year:1944,dir:'Otto Preminger',country:'EE.UU.',genre:'Noir / Misterio',stream:'Criterion'},
+  {id:'m243',title:'The Big Sleep',year:1946,dir:'Howard Hawks',country:'EE.UU.',genre:'Noir / Thriller',stream:'Max'},
+  {id:'m244',title:'Out of the Past',year:1947,dir:'Jacques Tourneur',country:'EE.UU.',genre:'Noir / Drama',stream:'Criterion'},
+  {id:'m245',title:'Touch of Evil',year:1958,dir:'Orson Welles',country:'EE.UU.',genre:'Noir / Thriller',stream:'Criterion'},
+  {id:'m246',title:'The Killing',year:1956,dir:'Stanley Kubrick',country:'EE.UU.',genre:'Crimen / Noir',stream:'Criterion'},
+  {id:'m247',title:'Reservoir Dogs',year:1992,dir:'Quentin Tarantino',country:'EE.UU.',genre:'Crimen / Thriller',stream:'Amazon Prime'},
+  {id:'m248',title:'Pulp Fiction',year:1994,dir:'Quentin Tarantino',country:'EE.UU.',genre:'Crimen / Comedia',stream:'Amazon Prime'},
+  {id:'m249',title:'The French Connection',year:1971,dir:'William Friedkin',country:'EE.UU.',genre:'Crimen / Thriller',stream:'Max'},
+  {id:'m250',title:'Heat',year:1995,dir:'Michael Mann',country:'EE.UU.',genre:'Crimen / Drama',stream:'Max'},
+
+  /* GÉNERO — MUSICALES */
+  {id:'m251',title:'Singin\' in the Rain',year:1952,dir:'Donen / Kelly',country:'EE.UU.',genre:'Musical / Comedia',stream:'Max'},
+  {id:'m252',title:'An American in Paris',year:1951,dir:'Vincente Minnelli',country:'EE.UU.',genre:'Musical / Romance',stream:'Max'},
+  {id:'m253',title:'La La Land',year:2016,dir:'Damien Chazelle',country:'EE.UU.',genre:'Musical / Romance',stream:'Max'},
+  {id:'m254',title:'Whiplash',year:2014,dir:'Damien Chazelle',country:'EE.UU.',genre:'Drama / Musical',stream:'Netflix'},
+  {id:'m255',title:'8 Mile',year:2002,dir:'Curtis Hanson',country:'EE.UU.',genre:'Drama / Musical',stream:'Amazon Prime'},
+  {id:'m256',title:'Prince: Sign o\' the Times',year:1987,dir:'Prince',country:'EE.UU.',genre:'Concierto / Documental',stream:'MUBI'},
+  {id:'m257',title:'Stop Making Sense',year:1984,dir:'Jonathan Demme',country:'EE.UU.',genre:'Documental / Concierto',stream:'Amazon Prime'},
+  {id:'m258',title:'Buena Vista Social Club',year:1999,dir:'Wim Wenders',country:'EE.UU. / Cuba',genre:'Documental / Musical',stream:'Amazon Prime'},
+  {id:'m259',title:'Dancer in the Dark',year:2000,dir:'Lars von Trier',country:'Dinamarca',genre:'Musical / Drama / Tragedia',stream:'MUBI'},
+  {id:'m260',title:'Hedwig and the Angry Inch',year:2001,dir:'John Cameron Mitchell',country:'EE.UU.',genre:'Musical / Drama',stream:'Max'},
+
+  /* GÉNERO — ANIMACIÓN */
+  {id:'m261',title:'Princess Mononoke',year:1997,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Fantasía / Aventura',stream:'Max'},
+  {id:'m262',title:'Nausicaä of the Valley of the Wind',year:1984,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Ciencia Ficción',stream:'Max'},
+  {id:'m263',title:'Castle in the Sky',year:1986,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Aventura',stream:'Max'},
+  {id:'m264',title:'My Neighbor Totoro',year:1988,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Fantasía',stream:'Max'},
+  {id:'m265',title:'The Tale of Princess Kaguya',year:2013,dir:'Isao Takahata',country:'Japón',genre:'Animación / Drama',stream:'Max'},
+  {id:'m266',title:'Persepolis',year:2007,dir:'Marjane Satrapi / Vincent Paronnaud',country:'Francia / Irán',genre:'Animación / Biográfico',stream:'MUBI'},
+  {id:'m267',title:'Akira',year:1988,dir:'Katsuhiro Otomo',country:'Japón',genre:'Animación / Ciencia Ficción',stream:'Amazon Prime'},
+  {id:'m268',title:'Ghost in the Shell',year:1995,dir:'Mamoru Oshii',country:'Japón',genre:'Animación / Ciencia Ficción',stream:'Netflix'},
+  {id:'m269',title:'The Wind Rises',year:2013,dir:'Hayao Miyazaki',country:'Japón',genre:'Animación / Biográfico',stream:'Max'},
+  {id:'m270',title:'Waltz with Bashir',year:2008,dir:'Ari Folman',country:'Israel',genre:'Animación / Documental / Guerra',stream:'MUBI'},
+
+  /* EE.UU. — CLÁSICOS DE HOLLYWOOD */
+  {id:'m271',title:'All About Eve',year:1950,dir:'Joseph L. Mankiewicz',country:'EE.UU.',genre:'Drama',stream:'Max'},
+  {id:'m272',title:'Casablanca',year:1942,dir:'Michael Curtiz',country:'EE.UU.',genre:'Drama / Romance / Guerra',stream:'Max'},
+  {id:'m273',title:'How Green Was My Valley',year:1941,dir:'John Ford',country:'EE.UU.',genre:'Drama / Familiar',stream:'Max'},
+  {id:'m274',title:'On the Waterfront',year:1954,dir:'Elia Kazan',country:'EE.UU.',genre:'Drama / Crimen',stream:'Criterion'},
+  {id:'m275',title:'A Streetcar Named Desire',year:1951,dir:'Elia Kazan',country:'EE.UU.',genre:'Drama',stream:'Max'},
+  {id:'m276',title:'12 Angry Men',year:1957,dir:'Sidney Lumet',country:'EE.UU.',genre:'Drama / Jurídico',stream:'Amazon Prime'},
+  {id:'m277',title:'Network',year:1976,dir:'Sidney Lumet',country:'EE.UU.',genre:'Drama / Sátira',stream:'Max'},
+  {id:'m278',title:'Dog Day Afternoon',year:1975,dir:'Sidney Lumet',country:'EE.UU.',genre:'Drama / Crimen',stream:'Max'},
+  {id:'m279',title:'The Conversation',year:1974,dir:'Francis Ford Coppola',country:'EE.UU.',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m280',title:'McCabe and Mrs. Miller',year:1971,dir:'Robert Altman',country:'EE.UU.',genre:'Western / Drama',stream:'Max'},
+
+  /* EE.UU. — NUEVO CINE INDEPENDIENTE */
+  {id:'m281',title:'Mean Streets',year:1973,dir:'Martin Scorsese',country:'EE.UU.',genre:'Drama / Crimen',stream:'Max'},
+  {id:'m282',title:'Taxi Driver',year:1976,dir:'Martin Scorsese',country:'EE.UU.',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m283',title:'Raging Bull',year:1980,dir:'Martin Scorsese',country:'EE.UU.',genre:'Drama / Biográfico',stream:'Amazon Prime'},
+  {id:'m284',title:'Goodfellas',year:1990,dir:'Martin Scorsese',country:'EE.UU.',genre:'Crimen / Drama',stream:'Max'},
+  {id:'m285',title:'The Age of Innocence',year:1993,dir:'Martin Scorsese',country:'EE.UU.',genre:'Drama / Romance / Período',stream:'Amazon Prime'},
+  {id:'m286',title:'Days of Heaven',year:1978,dir:'Terrence Malick',country:'EE.UU.',genre:'Drama / Romance',stream:'Criterion'},
+  {id:'m287',title:'Badlands',year:1973,dir:'Terrence Malick',country:'EE.UU.',genre:'Drama / Crimen',stream:'Criterion'},
+  {id:'m288',title:'Five Easy Pieces',year:1970,dir:'Bob Rafelson',country:'EE.UU.',genre:'Drama',stream:'Criterion'},
+  {id:'m289',title:'Easy Rider',year:1969,dir:'Dennis Hopper',country:'EE.UU.',genre:'Drama / Road Movie',stream:'Amazon Prime'},
+  {id:'m290',title:'Harold and Maude',year:1971,dir:'Hal Ashby',country:'EE.UU.',genre:'Comedia / Drama',stream:'Paramount+'},
+
+  /* EE.UU. — CINE AFROAMERICANO */
+  {id:'m291',title:'Do the Right Thing',year:1989,dir:'Spike Lee',country:'EE.UU.',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m292',title:'Malcolm X',year:1992,dir:'Spike Lee',country:'EE.UU.',genre:'Drama / Biográfico',stream:'Max'},
+  {id:'m293',title:'Selma',year:2014,dir:'Ava DuVernay',country:'EE.UU.',genre:'Drama / Histórico / Biográfico',stream:'Amazon Prime'},
+  {id:'m294',title:'Boyz n the Hood',year:1991,dir:'John Singleton',country:'EE.UU.',genre:'Drama',stream:'Netflix'},
+  {id:'m295',title:'Eve\'s Bayou',year:1997,dir:'Kasi Lemmons',country:'EE.UU.',genre:'Drama / Misterio',stream:'Max'},
+  {id:'m296',title:'Daughters of the Dust',year:1991,dir:'Julie Dash',country:'EE.UU.',genre:'Drama / Histórico',stream:'Criterion'},
+  {id:'m297',title:'Get Out',year:2017,dir:'Jordan Peele',country:'EE.UU.',genre:'Horror / Thriller / Social',stream:'Amazon Prime'},
+  {id:'m298',title:'US',year:2019,dir:'Jordan Peele',country:'EE.UU.',genre:'Horror / Thriller',stream:'Amazon Prime'},
+  {id:'m299',title:'Beasts of the Southern Wild',year:2012,dir:'Benh Zeitlin',country:'EE.UU.',genre:'Drama / Fantasía',stream:'Amazon Prime'},
+  {id:'m300',title:'The Harder They Come',year:1972,dir:'Perry Henzell',country:'Jamaica',genre:'Drama / Musical',stream:'Criterion'},
+
+  /* EXTRAS VARIADOS */
+  {id:'m301',title:'Secrets and Lies',year:1996,dir:'Mike Leigh',country:'UK',genre:'Drama',stream:'Criterion'},
+  {id:'m302',title:'Naked',year:1993,dir:'Mike Leigh',country:'UK',genre:'Drama',stream:'Criterion'},
+  {id:'m303',title:'Vera Drake',year:2004,dir:'Mike Leigh',country:'UK',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m304',title:'Happy-Go-Lucky',year:2008,dir:'Mike Leigh',country:'UK',genre:'Comedia / Drama',stream:'Amazon Prime'},
+  {id:'m305',title:'Blue (Bleu)',year:1993,dir:'Derek Jarman',country:'UK',genre:'Experimental / Documental',stream:'Criterion'},
+  {id:'m306',title:'Edward II',year:1991,dir:'Derek Jarman',country:'UK',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'m307',title:'Caravaggio',year:1986,dir:'Derek Jarman',country:'UK',genre:'Drama / Biográfico',stream:'MUBI'},
+  {id:'m308',title:'The Hours',year:2002,dir:'Stephen Daldry',country:'EE.UU. / UK',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m309',title:'Carol',year:2015,dir:'Todd Haynes',country:'EE.UU. / UK',genre:'Drama / Romance',stream:'Amazon Prime'},
+  {id:'m310',title:'Safe',year:1995,dir:'Todd Haynes',country:'EE.UU.',genre:'Drama / Thriller',stream:'Criterion'},
+  {id:'m311',title:'Far from Heaven',year:2002,dir:'Todd Haynes',country:'EE.UU.',genre:'Drama / Romance',stream:'Amazon Prime'},
+  {id:'m312',title:'Happiness',year:1998,dir:'Todd Solondz',country:'EE.UU.',genre:'Drama / Comedia Negra',stream:'Criterion'},
+  {id:'m313',title:'Welcome to the Dollhouse',year:1995,dir:'Todd Solondz',country:'EE.UU.',genre:'Comedia / Drama',stream:'Criterion'},
+  {id:'m314',title:'Magnolia',year:1999,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m315',title:'Boogie Nights',year:1997,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Drama',stream:'Max'},
+  {id:'m316',title:'Punch-Drunk Love',year:2002,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Comedia Romántica / Drama',stream:'Amazon Prime'},
+  {id:'m317',title:'Inherent Vice',year:2014,dir:'Paul Thomas Anderson',country:'EE.UU.',genre:'Comedia / Thriller / Misterio',stream:'Max'},
+  {id:'m318',title:'No Country for Old Men',year:2007,dir:'Coen Brothers',country:'EE.UU.',genre:'Thriller / Drama / Western',stream:'Netflix'},
+  {id:'m319',title:'Fargo',year:1996,dir:'Coen Brothers',country:'EE.UU.',genre:'Crimen / Comedia / Thriller',stream:'Amazon Prime'},
+  {id:'m320',title:'Barton Fink',year:1991,dir:'Coen Brothers',country:'EE.UU.',genre:'Drama / Misterio',stream:'Amazon Prime'},
+  {id:'m321',title:'Blood Simple',year:1984,dir:'Coen Brothers',country:'EE.UU.',genre:'Thriller / Noir',stream:'Amazon Prime'},
+  {id:'m322',title:'The Big Lebowski',year:1998,dir:'Coen Brothers',country:'EE.UU.',genre:'Comedia / Misterio',stream:'Amazon Prime'},
+  {id:'m323',title:'Miller\'s Crossing',year:1990,dir:'Coen Brothers',country:'EE.UU.',genre:'Crimen / Drama',stream:'Amazon Prime'},
+  {id:'m324',title:'A Serious Man',year:2009,dir:'Coen Brothers',country:'EE.UU.',genre:'Drama / Comedia',stream:'Amazon Prime'},
+  {id:'m325',title:'Inside Llewyn Davis',year:2013,dir:'Coen Brothers',country:'EE.UU.',genre:'Drama / Musical',stream:'Netflix'},
+  {id:'m326',title:'True Grit',year:2010,dir:'Coen Brothers',country:'EE.UU.',genre:'Western',stream:'Amazon Prime'},
+  {id:'m327',title:'The Revenant',year:2015,dir:'Alejandro González Iñárritu',country:'EE.UU.',genre:'Aventura / Drama / Supervivencia',stream:'Max'},
+  {id:'m328',title:'Birdman',year:2014,dir:'Alejandro González Iñárritu',country:'EE.UU.',genre:'Drama / Comedia',stream:'Disney+'},
+  {id:'m329',title:'21 Grams',year:2003,dir:'Alejandro González Iñárritu',country:'EE.UU.',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m330',title:'Babel',year:2006,dir:'Alejandro González Iñárritu',country:'EE.UU. / México',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m331',title:'Lost Highway',year:1997,dir:'David Lynch',country:'EE.UU.',genre:'Misterio / Thriller',stream:'Amazon Prime'},
+  {id:'m332',title:'Inland Empire',year:2006,dir:'David Lynch',country:'EE.UU.',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m333',title:'Eraserhead',year:1977,dir:'David Lynch',country:'EE.UU.',genre:'Drama / Horror / Surrealismo',stream:'Criterion'},
+  {id:'m334',title:'The Elephant Man',year:1980,dir:'David Lynch',country:'EE.UU. / UK',genre:'Drama / Biográfico',stream:'Paramount+'},
+  {id:'m335',title:'Dead Man',year:1995,dir:'Jim Jarmusch',country:'EE.UU.',genre:'Western / Drama',stream:'MUBI'},
+  {id:'m336',title:'Night on Earth',year:1991,dir:'Jim Jarmusch',country:'EE.UU.',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'m337',title:'Mystery Train',year:1989,dir:'Jim Jarmusch',country:'EE.UU. / Japón',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'m338',title:'Stranger Than Paradise',year:1984,dir:'Jim Jarmusch',country:'EE.UU.',genre:'Comedia / Drama',stream:'Criterion'},
+  {id:'m339',title:'Ghost Dog: The Way of the Samurai',year:1999,dir:'Jim Jarmusch',country:'EE.UU. / Francia',genre:'Acción / Drama',stream:'MUBI'},
+  {id:'m340',title:'Short Cuts',year:1993,dir:'Robert Altman',country:'EE.UU.',genre:'Drama',stream:'Criterion'},
+  {id:'m341',title:'The Player',year:1992,dir:'Robert Altman',country:'EE.UU.',genre:'Comedia / Sátira',stream:'Amazon Prime'},
+  {id:'m342',title:'Gosford Park',year:2001,dir:'Robert Altman',country:'UK',genre:'Misterio / Drama / Comedia',stream:'Amazon Prime'},
+  {id:'m343',title:'Eyes Wide Shut',year:1999,dir:'Stanley Kubrick',country:'EE.UU. / UK',genre:'Drama / Misterio / Erótico',stream:'Max'},
+  {id:'m344',title:'Full Metal Jacket',year:1987,dir:'Stanley Kubrick',country:'UK',genre:'Guerra / Drama',stream:'Max'},
+  {id:'m345',title:'A Clockwork Orange',year:1971,dir:'Stanley Kubrick',country:'UK',genre:'Ciencia Ficción / Drama',stream:'Max'},
+  {id:'m346',title:'The Shining',year:1980,dir:'Stanley Kubrick',country:'UK / EE.UU.',genre:'Terror / Psicológico',stream:'Max'},
+  {id:'m347',title:'Paths of Glory',year:1957,dir:'Stanley Kubrick',country:'EE.UU.',genre:'Drama / Guerra',stream:'Criterion'},
+  {id:'m348',title:'Lolita',year:1962,dir:'Stanley Kubrick',country:'UK / EE.UU.',genre:'Drama / Sátira',stream:'Max'},
+  {id:'m349',title:'Platoon',year:1986,dir:'Oliver Stone',country:'EE.UU.',genre:'Guerra / Drama',stream:'Amazon Prime'},
+  {id:'m350',title:'Salvador',year:1986,dir:'Oliver Stone',country:'EE.UU.',genre:'Drama / Político / Periodismo',stream:'YouTube'},
+  {id:'m351',title:'JFK',year:1991,dir:'Oliver Stone',country:'EE.UU.',genre:'Thriller / Drama / Político',stream:'Max'},
+  {id:'m352',title:'Schindler\'s List',year:1993,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Historia / Guerra',stream:'Amazon Prime'},
+  {id:'m353',title:'Empire of the Sun',year:1987,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Guerra',stream:'Max'},
+  {id:'m354',title:'The Sugarland Express',year:1974,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Crimen',stream:'Amazon Prime'},
+  {id:'m355',title:'Jaws',year:1975,dir:'Steven Spielberg',country:'EE.UU.',genre:'Thriller / Terror',stream:'Amazon Prime'},
+  {id:'m356',title:'Close Encounters of the Third Kind',year:1977,dir:'Steven Spielberg',country:'EE.UU.',genre:'Ciencia Ficción',stream:'Amazon Prime'},
+  {id:'m357',title:'The Color Purple',year:1985,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Histórico',stream:'Max'},
+  {id:'m358',title:'Amistad',year:1997,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Histórico',stream:'Amazon Prime'},
+  {id:'m359',title:'Lincoln',year:2012,dir:'Steven Spielberg',country:'EE.UU.',genre:'Drama / Biográfico / Histórico',stream:'Max'},
+  {id:'m360',title:'Duel',year:1971,dir:'Steven Spielberg',country:'EE.UU.',genre:'Thriller',stream:'Amazon Prime'},
+
+  /* EXTRAS — CONTEMPORÁNEO GLOBAL */
+  {id:'m361',title:'Burning',year:2018,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Thriller / Drama / Misterio',stream:'MUBI'},
+  {id:'m362',title:'Poetry',year:2010,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Drama',stream:'MUBI'},
+  {id:'m363',title:'Secret Sunshine',year:2007,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Drama',stream:'MUBI'},
+  {id:'m364',title:'Minari',year:2020,dir:'Lee Isaac Chung',country:'EE.UU.',genre:'Drama / Familiar',stream:'Amazon Prime'},
+  {id:'m365',title:'Past Lives',year:2023,dir:'Celine Song',country:'EE.UU. / Corea del Sur',genre:'Drama / Romance',stream:'Max'},
+  {id:'m366',title:'Aftersun',year:2022,dir:'Charlotte Wells',country:'UK',genre:'Drama',stream:'MUBI'},
+  {id:'m367',title:'The Worst Person in the World',year:2021,dir:'Joachim Trier',country:'Noruega',genre:'Drama / Romance / Comedia',stream:'MUBI'},
+  {id:'m368',title:'Oslo, August 31st',year:2011,dir:'Joachim Trier',country:'Noruega',genre:'Drama',stream:'MUBI'},
+  {id:'m369',title:'Reprise',year:2006,dir:'Joachim Trier',country:'Noruega',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'m370',title:'Son of Saul',year:2015,dir:'László Nemes',country:'Hungría',genre:'Drama / Guerra / Holocausto',stream:'Amazon Prime'},
+  {id:'m371',title:'Sunset',year:2018,dir:'László Nemes',country:'Hungría',genre:'Drama / Histórico / Misterio',stream:'MUBI'},
+  {id:'m372',title:'4 Months, 3 Weeks and 2 Days',year:2007,dir:'Cristian Mungiu',country:'Rumanía',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m373',title:'Beyond the Hills',year:2012,dir:'Cristian Mungiu',country:'Rumanía',genre:'Drama',stream:'MUBI'},
+  {id:'m374',title:'12:08 East of Bucharest',year:2006,dir:'Corneliu Porumboiu',country:'Rumanía',genre:'Comedia / Drama',stream:'MUBI'},
+  {id:'m375',title:'Police, Adjective',year:2009,dir:'Corneliu Porumboiu',country:'Rumanía',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'m376',title:'The Death of Mr. Lazarescu',year:2005,dir:'Cristi Puiu',country:'Rumanía',genre:'Drama',stream:'Criterion'},
+  {id:'m377',title:'Sieranevada',year:2016,dir:'Cristi Puiu',country:'Rumanía',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'m378',title:'Victoria',year:2015,dir:'Sebastian Schipper',country:'Alemania',genre:'Thriller / Drama',stream:'Netflix'},
+  {id:'m379',title:'Toni Erdmann',year:2016,dir:'Maren Ade',country:'Alemania',genre:'Comedia / Drama',stream:'MUBI'},
+  {id:'m380',title:'The Lives of Others',year:2006,dir:'Florian Henckel von Donnersmarck',country:'Alemania',genre:'Drama / Thriller / Espionaje',stream:'Amazon Prime'},
+  {id:'m381',title:'Goodbye Lenin!',year:2003,dir:'Wolfgang Becker',country:'Alemania',genre:'Drama / Comedia',stream:'Amazon Prime'},
+  {id:'m382',title:'Run Lola Run',year:1998,dir:'Tom Tykwer',country:'Alemania',genre:'Thriller / Acción',stream:'Netflix'},
+  {id:'m383',title:'M. Butterfly',year:1993,dir:'David Cronenberg',country:'EE.UU.',genre:'Drama / Romance / Político',stream:'Amazon Prime'},
+  {id:'m384',title:'The Fly',year:1986,dir:'David Cronenberg',country:'EE.UU.',genre:'Terror / Ciencia Ficción',stream:'Disney+'},
+  {id:'m385',title:'Naked Lunch',year:1991,dir:'David Cronenberg',country:'Canadá',genre:'Drama / Experimental / Biográfico',stream:'Amazon Prime'},
+  {id:'m386',title:'Crash',year:1996,dir:'David Cronenberg',country:'Canadá',genre:'Drama / Erótico / Thriller',stream:'MUBI'},
+  {id:'m387',title:'A History of Violence',year:2005,dir:'David Cronenberg',country:'EE.UU.',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m388',title:'Eastern Promises',year:2007,dir:'David Cronenberg',country:'UK / Canadá',genre:'Thriller / Crimen',stream:'Amazon Prime'},
+  {id:'m389',title:'Maps to the Stars',year:2014,dir:'David Cronenberg',country:'Canadá',genre:'Drama / Sátira',stream:'Amazon Prime'},
+  {id:'m390',title:'Cosmopolis',year:2012,dir:'David Cronenberg',country:'Canadá / Francia',genre:'Drama / Ciencia Ficción',stream:'Amazon Prime'},
+  {id:'m391',title:'The Babadook',year:2014,dir:'Jennifer Kent',country:'Australia',genre:'Terror / Drama',stream:'Shudder'},
+  {id:'m392',title:'Snowtown',year:2011,dir:'Justin Kurzel',country:'Australia',genre:'Drama / Crimen',stream:'MUBI'},
+  {id:'m393',title:'Picnic at Hanging Rock',year:1975,dir:'Peter Weir',country:'Australia',genre:'Misterio / Drama',stream:'Criterion'},
+  {id:'m394',title:'The Year of Living Dangerously',year:1982,dir:'Peter Weir',country:'Australia',genre:'Drama / Romance / Político',stream:'Amazon Prime'},
+  {id:'m395',title:'Gallipoli',year:1981,dir:'Peter Weir',country:'Australia',genre:'Drama / Guerra',stream:'Amazon Prime'},
+  {id:'m396',title:'Lantana',year:2001,dir:'Ray Lawrence',country:'Australia',genre:'Thriller / Drama / Misterio',stream:'Amazon Prime'},
+  {id:'m397',title:'The Road',year:2009,dir:'John Hillcoat',country:'EE.UU.',genre:'Drama / Supervivencia / Post-apocalíptico',stream:'Amazon Prime'},
+  {id:'m398',title:'Son of the White Mare',year:1981,dir:'Marcell Jankovics',country:'Hungría',genre:'Animación / Fantasía / Mitología',stream:'MUBI'},
+  {id:'m399',title:'Tropical Malady',year:2004,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama / Misterio / Fantasía',stream:'MUBI'},
+  {id:'m400',title:'Blissfully Yours',year:2002,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m401',title:'Cemetery of Splendour',year:2015,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama / Fantasía',stream:'MUBI'},
+  {id:'m402',title:'Memoria',year:2021,dir:'Apichatpong Weerasethakul',country:'Colombia / Tailandia',genre:'Drama / Misterio',stream:'MUBI'},
+  {id:'m403',title:'Never Look Away',year:2018,dir:'Florian Henckel von Donnersmarck',country:'Alemania',genre:'Drama / Biográfico / Romance',stream:'Amazon Prime'},
+  {id:'m404',title:'Touch Me Not',year:2018,dir:'Adina Pintilie',country:'Rumanía',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m405',title:'Embrace of the Serpent',year:2015,dir:'Ciro Guerra',country:'Colombia',genre:'Drama / Aventura',stream:'Netflix'},
+  {id:'m406',title:'The Club',year:2015,dir:'Pablo Larraín',country:'Chile',genre:'Drama / Thriller',stream:'Netflix'},
+  {id:'m407',title:'Neruda',year:2016,dir:'Pablo Larraín',country:'Chile',genre:'Drama / Biográfico',stream:'Netflix'},
+  {id:'m408',title:'No',year:2012,dir:'Pablo Larraín',country:'Chile',genre:'Drama / Político / Histórico',stream:'MUBI'},
+  {id:'m409',title:'Post Mortem',year:2010,dir:'Pablo Larraín',country:'Chile',genre:'Drama / Político',stream:'MUBI'},
+  {id:'m410',title:'Tony Manero',year:2008,dir:'Pablo Larraín',country:'Chile',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m411',title:'A Woman\'s Tale',year:1991,dir:'Paul Cox',country:'Australia',genre:'Drama',stream:'YouTube'},
+  {id:'m412',title:'Man of Flowers',year:1983,dir:'Paul Cox',country:'Australia',genre:'Drama',stream:'YouTube'},
+  {id:'m413',title:'The Gleaners and I',year:2000,dir:'Agnès Varda',country:'Francia',genre:'Documental',stream:'Criterion'},
+  {id:'m414',title:'Faces Places (Visages Villages)',year:2017,dir:'Agnès Varda / JR',country:'Francia',genre:'Documental',stream:'Max'},
+  {id:'m415',title:'One Sings, the Other Doesn\'t',year:1977,dir:'Agnès Varda',country:'Francia',genre:'Drama / Feminismo',stream:'Criterion'},
+  {id:'m416',title:'The Beaches of Agnès',year:2008,dir:'Agnès Varda',country:'Francia',genre:'Documental / Autobiográfico',stream:'Criterion'},
+  {id:'m417',title:'Daguerréotypes',year:1976,dir:'Agnès Varda',country:'Francia',genre:'Documental',stream:'Criterion'},
+  {id:'m418',title:'Wanda',year:1970,dir:'Barbara Loden',country:'EE.UU.',genre:'Drama',stream:'Criterion'},
+  {id:'m419',title:'Meek\'s Cutoff',year:2010,dir:'Kelly Reichardt',country:'EE.UU.',genre:'Western / Drama',stream:'MUBI'},
+  {id:'m420',title:'Certain Women',year:2016,dir:'Kelly Reichardt',country:'EE.UU.',genre:'Drama',stream:'MUBI'},
+  {id:'m421',title:'First Cow',year:2019,dir:'Kelly Reichardt',country:'EE.UU.',genre:'Drama / Western',stream:'MUBI'},
+  {id:'m422',title:'Wendy and Lucy',year:2008,dir:'Kelly Reichardt',country:'EE.UU.',genre:'Drama',stream:'MUBI'},
+  {id:'m423',title:'Old Joy',year:2006,dir:'Kelly Reichardt',country:'EE.UU.',genre:'Drama',stream:'MUBI'},
+  {id:'m424',title:'Hive',year:2021,dir:'Blerta Basholli',country:'Kosovo',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m425',title:'Quo vadis, Aida?',year:2020,dir:'Jasmila Žbanić',country:'Bosnia-Herzegovina',genre:'Drama / Historia / Guerra',stream:'MUBI'},
+  {id:'m426',title:'No Bears',year:2022,dir:'Jafar Panahi',country:'Irán',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m427',title:'There Is No Evil',year:2020,dir:'Mohammad Rasoulof',country:'Irán',genre:'Drama',stream:'MUBI'},
+  {id:'m428',title:'The Salesman',year:2016,dir:'Asghar Farhadi',country:'Irán / Francia',genre:'Drama / Thriller',stream:'Netflix'},
+  {id:'m429',title:'About Elly',year:2009,dir:'Asghar Farhadi',country:'Irán',genre:'Drama / Misterio',stream:'MUBI'},
+  {id:'m430',title:'The Past',year:2013,dir:'Asghar Farhadi',country:'Francia / Irán',genre:'Drama / Misterio',stream:'Amazon Prime'},
+  {id:'m431',title:'Everybody Knows',year:2018,dir:'Asghar Farhadi',country:'España / Francia',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m432',title:'A Hero',year:2021,dir:'Asghar Farhadi',country:'Francia / Irán',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m433',title:'45 Years',year:2015,dir:'Andrew Haigh',country:'UK',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m434',title:'Weekend',year:2011,dir:'Andrew Haigh',country:'UK',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m435',title:'God\'s Own Country',year:2017,dir:'Francis Lee',country:'UK',genre:'Drama / Romance',stream:'Amazon Prime'},
+  {id:'m436',title:'The Favourite',year:2018,dir:'Yorgos Lanthimos',country:'UK / Irlanda',genre:'Drama / Comedia / Histórico',stream:'Disney+'},
+  {id:'m437',title:'The Lobster',year:2015,dir:'Yorgos Lanthimos',country:'UK / Grecia',genre:'Ciencia Ficción / Drama / Comedia',stream:'Amazon Prime'},
+  {id:'m438',title:'Dogtooth',year:2009,dir:'Yorgos Lanthimos',country:'Grecia',genre:'Drama / Thriller',stream:'Criterion'},
+  {id:'m439',title:'The Killing of a Sacred Deer',year:2017,dir:'Yorgos Lanthimos',country:'UK / Irlanda',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m440',title:'Alps',year:2011,dir:'Yorgos Lanthimos',country:'Grecia',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m441',title:'Lamb',year:2021,dir:'Valdimar Jóhannsson',country:'Islandia / Suecia / Polonia',genre:'Drama / Horror',stream:'Amazon Prime'},
+  {id:'m442',title:'Woman at War',year:2018,dir:'Benedikt Erlingsson',country:'Islandia / Francia / Ucrania',genre:'Drama / Comedia / Eco-thriller',stream:'Amazon Prime'},
+  {id:'m443',title:'The Mirror (Ayna)',year:1997,dir:'Jafar Panahi',country:'Irán',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m444',title:'Where Is My Friend\'s House?',year:1987,dir:'Abbas Kiarostami',country:'Irán',genre:'Drama',stream:'Criterion'},
+  {id:'m445',title:'A Separation',year:2011,dir:'Asghar Farhadi',country:'Irán',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m446',title:'Border (Gräns)',year:2018,dir:'Ali Abbasi',country:'Suecia / Dinamarca',genre:'Drama / Fantasía / Misterio',stream:'MUBI'},
+  {id:'m447',title:'The Square',year:2017,dir:'Ruben Östlund',country:'Suecia',genre:'Drama / Comedia / Sátira',stream:'MUBI'},
+  {id:'m448',title:'Force Majeure',year:2014,dir:'Ruben Östlund',country:'Suecia',genre:'Drama / Comedia',stream:'MUBI'},
+  {id:'m449',title:'Triangle of Sadness',year:2022,dir:'Ruben Östlund',country:'Suecia / Alemania',genre:'Comedia / Sátira',stream:'MUBI'},
+  {id:'m450',title:'The Act of Seeing with One\'s Own Eyes',year:1971,dir:'Stan Brakhage',country:'EE.UU.',genre:'Documental / Experimental / Arte',stream:'YouTube'},
+  {id:'m451',title:'Syndromes and a Century',year:2006,dir:'Apichatpong Weerasethakul',country:'Tailandia',genre:'Drama',stream:'MUBI'},
+  {id:'m452',title:'Leap Year',year:2010,dir:'Michael Rowe',country:'México',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m453',title:'Miss Bala',year:2011,dir:'Gerardo Naranjo',country:'México',genre:'Thriller / Drama',stream:'Netflix'},
+  {id:'m454',title:'The Last of Ours',year:2014,dir:'Dina Amer',country:'Egipto / Francia',genre:'Documental',stream:'YouTube'},
+  {id:'m455',title:'Atlantics',year:2019,dir:'Mati Diop',country:'Senegal / Francia',genre:'Drama / Fantasía / Romance',stream:'Netflix'},
+  {id:'m456',title:'Sembene!',year:2015,dir:'Samba Gadjigo / Jason Silverman',country:'EE.UU.',genre:'Documental',stream:'MUBI'},
+  {id:'m457',title:'Martin Eden',year:2019,dir:'Pietro Marcello',country:'Italia',genre:'Drama / Biográfico',stream:'MUBI'},
+  {id:'m458',title:'L\'Humanité',year:1999,dir:'Bruno Dumont',country:'Francia',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m459',title:'Camille Claudel 1915',year:2013,dir:'Bruno Dumont',country:'Francia',genre:'Drama / Biográfico',stream:'MUBI'},
+  {id:'m460',title:'Twentynine Palms',year:2003,dir:'Bruno Dumont',country:'Francia',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m461',title:'I, Tonya',year:2017,dir:'Craig Gillespie',country:'EE.UU.',genre:'Drama / Biográfico',stream:'Max'},
+  {id:'m462',title:'Spencer',year:2021,dir:'Pablo Larraín',country:'UK / Alemania / Chile',genre:'Drama / Biográfico',stream:'Max'},
+  {id:'m463',title:'Jackie',year:2016,dir:'Pablo Larraín',country:'Chile / EE.UU.',genre:'Drama / Biográfico',stream:'Max'},
+  {id:'m464',title:'Titane',year:2021,dir:'Julia Ducournau',country:'Francia / Bélgica',genre:'Horror / Ciencia Ficción',stream:'MUBI'},
+  {id:'m465',title:'Rattle of a Simple Man',year:1964,dir:'Muriel Box',country:'UK',genre:'Comedia / Drama',stream:'YouTube'},
+  {id:'m466',title:'Ratcatcher',year:1999,dir:'Lynne Ramsay',country:'UK / Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m467',title:'Morvern Callar',year:2002,dir:'Lynne Ramsay',country:'UK',genre:'Drama',stream:'MUBI'},
+  {id:'m468',title:'Goodbye, Dragon Inn',year:2003,dir:'Tsai Ming-liang',country:'Taiwán',genre:'Drama / Experimental',stream:'MUBI'},
+  {id:'m469',title:'What Time Is It There?',year:2001,dir:'Tsai Ming-liang',country:'Taiwán',genre:'Drama',stream:'MUBI'},
+  {id:'m470',title:'Vive L\'Amour',year:1994,dir:'Tsai Ming-liang',country:'Taiwán',genre:'Drama',stream:'Criterion'},
+  {id:'m471',title:'Platform',year:2000,dir:'Jia Zhangke',country:'China / Hong Kong / Japón',genre:'Drama',stream:'MUBI'},
+  {id:'m472',title:'Unknown Pleasures',year:2002,dir:'Jia Zhangke',country:'China / Japón / Corea del Sur / Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m473',title:'Still Life',year:2006,dir:'Jia Zhangke',country:'China',genre:'Drama',stream:'MUBI'},
+  {id:'m474',title:'A Touch of Sin',year:2013,dir:'Jia Zhangke',country:'China / Japón',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m475',title:'Mountains May Depart',year:2015,dir:'Jia Zhangke',country:'China / Francia / Japón',genre:'Drama',stream:'MUBI'},
+  {id:'m476',title:'Blind Shaft',year:2003,dir:'Li Yang',country:'China / Alemania',genre:'Drama / Thriller',stream:'MUBI'},
+  {id:'m477',title:'Beijing Bicycle',year:2001,dir:'Wang Xiaoshuai',country:'China / Francia',genre:'Drama',stream:'MUBI'},
+  {id:'m478',title:'The Blue Kite',year:1993,dir:'Tian Zhuangzhuang',country:'China',genre:'Drama / Histórico',stream:'MUBI'},
+  {id:'m479',title:'Tuya\'s Marriage',year:2006,dir:'Wang Quan\'an',country:'China',genre:'Drama',stream:'MUBI'},
+  {id:'m480',title:'The Road Home',year:1999,dir:'Zhang Yimou',country:'China',genre:'Drama / Romance',stream:'Amazon Prime'},
+  {id:'m481',title:'Together (He ni zai yiqi)',year:2002,dir:'Chen Kaige',country:'China',genre:'Drama / Musical',stream:'YouTube'},
+  {id:'m482',title:'Springtime in a Small Town',year:2002,dir:'Tian Zhuangzhuang',country:'China',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m483',title:'Lan Yu',year:2001,dir:'Stanley Kwan',country:'China / Hong Kong',genre:'Drama / Romance',stream:'MUBI'},
+  {id:'m484',title:'The Housemaid',year:1960,dir:'Kim Ki-young',country:'Corea del Sur',genre:'Horror / Drama / Thriller',stream:'Criterion'},
+  {id:'m485',title:'Peppermint Candy',year:1999,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Drama',stream:'MUBI'},
+  {id:'m486',title:'A Tale of Two Sisters',year:2003,dir:'Kim Jee-woon',country:'Corea del Sur',genre:'Horror / Psicológico',stream:'Amazon Prime'},
+  {id:'m487',title:'I Saw the Devil',year:2010,dir:'Kim Jee-woon',country:'Corea del Sur',genre:'Thriller / Horror',stream:'Amazon Prime'},
+  {id:'m488',title:'The Host',year:2006,dir:'Bong Joon-ho',country:'Corea del Sur',genre:'Ciencia Ficción / Terror / Drama',stream:'Amazon Prime'},
+  {id:'m489',title:'Mother',year:2009,dir:'Bong Joon-ho',country:'Corea del Sur',genre:'Thriller / Drama',stream:'Amazon Prime'},
+  {id:'m490',title:'Pieta',year:2012,dir:'Kim Ki-duk',country:'Corea del Sur',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m491',title:'The Isle',year:2000,dir:'Kim Ki-duk',country:'Corea del Sur',genre:'Drama / Horror',stream:'Amazon Prime'},
+  {id:'m492',title:'Bad Guy',year:2001,dir:'Kim Ki-duk',country:'Corea del Sur',genre:'Drama / Thriller',stream:'Amazon Prime'},
+  {id:'m493',title:'Samaritan Girl',year:2004,dir:'Kim Ki-duk',country:'Corea del Sur',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m494',title:'Sympathy for Lady Vengeance',year:2005,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Drama',stream:'Max'},
+  {id:'m495',title:'Sympathy for Mr. Vengeance',year:2002,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Drama',stream:'Max'},
+  {id:'m496',title:'Thirst',year:2009,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Horror / Romance / Drama',stream:'Amazon Prime'},
+  {id:'m497',title:'Decision to Leave',year:2022,dir:'Park Chan-wook',country:'Corea del Sur',genre:'Thriller / Romance',stream:'Amazon Prime'},
+  {id:'m498',title:'Broker',year:2022,dir:'Hirokazu Koreeda',country:'Corea del Sur',genre:'Drama',stream:'Amazon Prime'},
+  {id:'m499',title:'The Gangster, the Cop, the Devil',year:2019,dir:'Lee Won-tae',country:'Corea del Sur',genre:'Acción / Crimen / Thriller',stream:'Netflix'},
+  {id:'m500',title:'Burning (Beoning)',year:2018,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Drama / Thriller / Misterio',stream:'MUBI'}
+];
+
+/* ============================================================
+   TMDB POSTER FETCH
+   Uses TMDB public search — no API key needed for basic search
+   Falls back to placeholder gracefully
+   ============================================================ */
+
+var TMDB_KEY = '2dca580c2a14b55200e784d157207b4d'; /* public demo key */
+
+function fetchPoster(movieId, title, year, imgEl, placeholderEl) {
+  if (posterCache[movieId]) {
+    if (posterCache[movieId] === 'none') {
+      showPlaceholder(placeholderEl, title, year);
+    } else {
+      imgEl.src = posterCache[movieId];
+      imgEl.style.display = 'block';
+      if (placeholderEl) { placeholderEl.style.display = 'none'; }
+    }
+    var spinner = imgEl.parentNode ? imgEl.parentNode.querySelector('.poster-loading') : null;
+    if (spinner) { spinner.style.display = 'none'; }
+    return;
+  }
+
+  var query = encodeURIComponent(title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + year + '&language=es-ES';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var spinner = imgEl.parentNode ? imgEl.parentNode.querySelector('.poster-loading') : null;
+    if (spinner) { spinner.style.display = 'none'; }
+
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0) {
+          var result = data.results[0];
+          /* Poster */
+          if (result.poster_path) {
+            var posterUrl = 'https://image.tmdb.org/t/p/w300' + result.poster_path;
+            posterCache[movieId] = posterUrl;
+            var currentImg = document.getElementById('poster-img-' + movieId);
+            if (currentImg) {
+              currentImg.src = posterUrl;
+              currentImg.style.display = 'block';
+              var ph = document.getElementById('poster-ph-' + movieId);
+              if (ph) { ph.style.display = 'none'; }
+            }
+          } else {
+            posterCache[movieId] = 'none';
+            var ph2 = document.getElementById('poster-ph-' + movieId);
+            if (ph2) { showPlaceholder(ph2, title, year); }
+          }
+          /* Synopsis — grab it for free from same call */
+          if (result.overview) {
+            synopsisCache[movieId] = result.overview;
+          }
+        } else {
+          posterCache[movieId] = 'none';
+          var ph3 = document.getElementById('poster-ph-' + movieId);
+          if (ph3) { showPlaceholder(ph3, title, year); }
+        }
+      } catch(e) {
+        posterCache[movieId] = 'none';
+        var ph4 = document.getElementById('poster-ph-' + movieId);
+        if (ph4) { showPlaceholder(ph4, title, year); }
+      }
+    } else {
+      posterCache[movieId] = 'none';
+      var ph5 = document.getElementById('poster-ph-' + movieId);
+      if (ph5) { showPlaceholder(ph5, title, year); }
+    }
+  };
+  xhr.send();
+}
+
+function showPlaceholder(el, title, year) {
+  if (!el) { return; }
+  el.style.display = 'flex';
+  el.innerHTML = '<div class="poster-placeholder-year">' + year + '</div>'
+    + '<div class="poster-placeholder-title">' + escapeHtml(title) + '</div>';
+}
+
+/* ============================================================
+   GENRE → ACCENT COLOR
+   ============================================================ */
+
+function getAccentClass(genre) {
+  var g = genre.toLowerCase();
+  if (g.indexOf('terror') !== -1 || g.indexOf('horror') !== -1) { return 'accent-terror'; }
+  if (g.indexOf('mudo') !== -1 || g.indexOf('silente') !== -1) { return 'accent-mudo'; }
+  if (g.indexOf('documental') !== -1) { return 'accent-doc'; }
+  if (g.indexOf('comedia') !== -1) { return 'accent-comedia'; }
+  if (g.indexOf('ciencia ficción') !== -1 || g.indexOf('sci') !== -1) { return 'accent-sci'; }
+  if (g.indexOf('acción') !== -1 || g.indexOf('accion') !== -1) { return 'accent-accion'; }
+  if (g.indexOf('romance') !== -1 || g.indexOf('romántic') !== -1) { return 'accent-romance'; }
+  if (g.indexOf('animación') !== -1 || g.indexOf('anime') !== -1) { return 'accent-anime'; }
+  if (g.indexOf('drama') !== -1) { return 'accent-drama'; }
+  return 'accent-default';
+}
+
+/* ============================================================
+   CURIOUS FACTS via Claude API
+   ============================================================ */
+
+/* Datos curiosos pre-escritos para películas clave */
+var facts = {
+  't1': 'Stanley Kubrick rodó la escena del amanecer estelar usando técnicas de front projection que él mismo inventó, con una pantalla reflectante 100 veces más brillante que las usadas hasta ese momento.',
+  't2': 'Carl Dreyer filmó el juicio de Juana de Arco con actores sin maquillaje — algo revolucionario en 1928 — y el resultado devastó a los extras, muchos de los cuales lloraron de verdad durante la filmación.',
+  't3': 'El Nosferatu original fue ordenado destruir por violar los derechos de Drácula de Bram Stoker. Sobrevivió solo porque ya había copias distribuidas por Europa antes de que la orden llegara.',
+  't4': 'La escalera de Odessa en El Acorazado Potemkin nunca existió como lugar de masacre real — Eisenstein la inventó. Aun así, la escena se convirtió en símbolo visual de la represión zarista.',
+  't5': 'Chaplin tardó cuatro años en terminar Luces de la Ciudad, en parte porque no encontraba la actriz ciega adecuada y refilmó la escena inicial con Virginia Cherrill más de 300 veces.',
+  't6': 'Orson Welles tenía 25 años cuando hizo Citizen Kane y nunca antes había dirigido una película. Convenció a RKO de darle control total alegando que necesitaba tiempo para "aprender" el equipo.',
+  't7': 'Ozu filmó Cuentos de Tokio con la cámara a 90 cm del suelo — la altura visual de alguien sentado en tatami — para mantener siempre la perspectiva humana y familiar de la cultura japonesa.',
+  't8': 'Toshiro Mifune fue elegido para Los Siete Samurais el mismo día de su audición, en la que llegó furioso y comenzó a actuar espontáneamente sin que nadie le diera indicaciones.',
+  't9': 'La Dolce Vita creó literalmente la palabra "paparazzi": uno de los personajes secundarios se llama así, y los fotógrafos italianos adoptaron el nombre como apodo colectivo.',
+  't10': '8½ es el título porque Fellini había hecho 6 largometrajes, 2 co-dirigidos y medio cortometraje antes de esa película. Lo contó él mismo como broma y se quedó como título oficial.',
+  't13': 'Tarkovsky tardó cinco años en conseguir permiso de las autoridades soviéticas para filmar Stalker, y cuando por fin lo obtuvo, el laboratorio reveló mal el material y tuvo que repetir todo el rodaje.',
+  't19': 'Marlon Brando apareció en el set de Apocalypse Now sin haber leído el guion y sin haberse cortado el pelo como pedía el papel. Coppola improvisó todas las escenas de Kurtz en base a las ideas de Brando.',
+  't22': 'La escena del caballo en El Padrino fue tan impactante que el director del sindicato de actores amenazó con parar la producción — Coppola tuvo que convencer a la ASPCA de que el animal estaba bien.',
+  't23': 'Lynch escribió Mulholland Drive originalmente como piloto de serie para ABC. Cuando la cadena lo rechazó, añadió 45 minutos y lo transformó en película. El presupuesto extra vino de Canal+.',
+  't25': 'Jeanne Dielman dura 3 horas 21 minutos sin música, sin aceleración, sin saltos temporales. Akerman insistió en que cada tarea doméstica durara exactamente lo que dura en la vida real.',
+  't33': 'Wong Kar-wai filmó In the Mood for Love sin guion terminado. Rodó durante 15 meses en Hong Kong, Macao y Bangkok, y el montaje final descartó más de la mitad del material grabado.',
+  't35': 'El plan de Parasite de esconder al hombre bajo las escaleras fue propuesto por el actor Song Kang-ho durante los ensayos. Bong Joon-ho lo aceptó al instante y reescribió esa parte del guion.',
+  't36': 'Miyazaki estaba técnicamente retirado cuando empezó El viaje de Chihiro. Lo empezó como regalo personal para la hija de 10 años de un amigo, sin intención de estreno comercial.',
+  't40': 'Bergman filmó Persona durante una enfermedad propia. Dijo después que no recordaba haber tomado muchas de las decisiones de puesta en escena — las atribuyó a "algo que tomó el control".',
+  't53': 'El laberinto del fauno fue rechazado por todos los estudios españoles antes de producirse. Del Toro lo financió en parte con su propio dinero y prometió a los inversores que ganaría el Oscar.',
+  't60': 'Kubrick filmó Barry Lyndon con lentes Zeiss f/0.7 diseñadas originalmente para la NASA, que permitían filmar a la luz de velas reales. Solo existen en el mundo alrededor de 10 de esas lentes.',
+  't76': 'Agnès Varda apareció ella misma en Cleo de 5 a 7 en un corto mudo que se proyecta dentro de la película, protagonizado por su esposo Jacques Demy y Anna Karina.',
+  't75': 'Amélie fue la primera película francesa no angloparlante en abrir simultáneamente en más de 2.000 cines de EE.UU. Audrey Tautou fue elegida de una lista de 1.500 candidatas.',
+  't97': 'Spike Jonze escribió Her durante una ruptura amorosa. La voz original de Samantha era de Samantha Morton, grabada en el set — pero tras el rodaje, Jonze decidió regrabarla con Scarlett Johansson.',
+  't78': 'Claire Denis filmó Beau Travail en Djibouti con legionarios franceses reales. La escena de baile final de Denis Lavant fue improvisada completamente — Denis le dijo simplemente "baila".',
+  't83': 'En El acto de matar, los perpetradores del genocidio indonesio de 1965 aceptaron participar creyendo que la película los haría famosos. Cuando vieron el resultado, varios tuvieron crisis de conciencia en cámara.',
+  't98': 'Varda filmó Los espigadores con una pequeña cámara digital que cargaba ella misma. Tenía 72 años. Dijo que quería que la cámara fuera tan pequeña como su mano para poder filmar sin que nadie la viera.',
+  't99': 'El caballo de Turín fue la última película de Béla Tarr. Está basada en el momento real en que Nietzsche abrazó a un caballo en Turín en 1889 y perdió la razón para siempre.',
+  't100': 'Moonlight fue la primera película con reparto completamente afroamericano y temática LGBTQ+ en ganar el Oscar a Mejor Película. Barry Jenkins la filmó en 25 días con un presupuesto de 1.5 millones.',
+  't84': 'Shoah duró 9 horas y 26 minutos y tomó 11 años de rodaje. Lanzmann entrevistó a más de 350 personas y utilizó solo 9 horas y media del material total grabado.',
+  't54': 'La Batalla de Argel fue prohibida en Francia durante 5 años. El Pentágono proyectó la película en 2003 como manual de estudio antes de la invasión de Iraq, por su análisis de la insurgencia urbana.',
+  't89': 'Hitchcock compró los derechos de la novela de Cornell Woolrich en la que está basada La Ventana Indiscreta de forma anónima para que el autor no subiera el precio.',
+  't90': 'Vértigo fracasó en taquilla en su estreno. Hitchcock, avergonzado, retiró los derechos durante décadas. Solo se redescubrió como obra maestra en los años 80 cuando Paramount volvió a distribuirla.',
+  't95': 'Umberto D. fue tan devastadoramente realista para la Italia de posguerra que el ministro de cultura italiano acusó a De Sica de "lavar la ropa sucia en público" y amenazó con quitarle la ciudadanía.',
+  't51': 'Elem Klimov tardó 14 años en conseguir permiso para filmar Ven y Mira. Muchos de los extras eran veteranos reales de la Segunda Guerra Mundial que lloraron durante el rodaje al recordar lo vivido.',
+  't52': 'La tumba de las luciérnagas fue producida simultáneamente con Mi vecino Totoro en el mismo estudio. Los animadores trabajaban en ambas a la vez, pasando de una historia de terror a una de ternura.',
+  't31': 'Satyajit Ray vendió su colección personal de discos de jazz occidental para financiar la primera semana de rodaje de Pather Panchali. El gobierno de Bengala le dio financiación solo después de ver el material grabado.'
+};
+
+function loadCuriousFact(movieId, title, year, dir) {
+  var btn = document.getElementById('curious-btn-' + movieId);
+  var factDiv = document.getElementById('curious-div-' + movieId);
+  if (!btn || !factDiv) { return; }
+
+  /* Toggle if already loaded */
+  if (factDiv.getAttribute('data-loaded') === 'true') {
+    factDiv.style.display = factDiv.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+
+  /* Check pre-written facts first */
+  if (facts[movieId]) {
+    factDiv.innerHTML = '<div class="curious-fact-label">✦ dato curioso</div>' + escapeHtml(facts[movieId]);
+    factDiv.style.display = 'block';
+    factDiv.setAttribute('data-loaded', 'true');
+    btn.style.display = 'none';
+    return;
+  }
+
+  /* Fallback: fetch via public CORS proxy */
+  btn.className = 'curious-btn loading-fact';
+  btn.innerHTML = '⏳ Cargando...';
+
+  var prompt = 'Dame UN solo dato curioso, inesperado o poco conocido sobre la pelicula "' + title + '" (' + year + ') de ' + dir + '. Maximo 2 oraciones directas. Sin introduccion.';
+
+  fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 200,
+      messages: [{role: 'user', content: prompt}]
+    })
+  }).then(function(res) {
+    return res.json();
+  }).then(function(data) {
+    var factDivNow = document.getElementById('curious-div-' + movieId);
+    var btnNow = document.getElementById('curious-btn-' + movieId);
+    var text = '';
+    if (data.content && data.content.length > 0) {
+      for (var i = 0; i < data.content.length; i++) {
+        if (data.content[i].type === 'text') { text = data.content[i].text; break; }
+      }
+    }
+    if (text && factDivNow) {
+      factDivNow.innerHTML = '<div class="curious-fact-label">✦ dato curioso</div>' + escapeHtml(text);
+      factDivNow.style.display = 'block';
+      factDivNow.setAttribute('data-loaded', 'true');
+      if (btnNow) { btnNow.style.display = 'none'; }
+    } else {
+      throw new Error('no text');
+    }
+  }).catch(function() {
+    var btnNow = document.getElementById('curious-btn-' + movieId);
+    var factDivNow = document.getElementById('curious-div-' + movieId);
+    if (factDivNow) {
+      factDivNow.innerHTML = '<div class="curious-fact-label">✦ dato curioso</div>No disponible para esta película.';
+      factDivNow.style.display = 'block';
+      factDivNow.setAttribute('data-loaded', 'true');
+    }
+    if (btnNow) { btnNow.style.display = 'none'; }
+  });
+}
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+
+function saveAll() {
+  if (!lsAvailable) { return; }
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({watched: watched, ratings: ratings, notes: notes}));
+  } catch(e) { console.error('Save error:', e); }
+}
+
+function loadAll() {
+  if (!lsAvailable) { return; }
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) { return; }
+    var data = JSON.parse(raw);
+    if (data.watched) { watched = data.watched; }
+    if (data.ratings) { ratings = data.ratings; }
+    if (data.notes) { notes = data.notes; }
+  } catch(e) { console.error('Load error:', e); }
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+
+function updateProgress() {
+  var allMovies = top100.concat(list500);
+  var total = allMovies.length;
+  var seen = 0;
+  var i;
+  for (i = 0; i < allMovies.length; i++) {
+    if (watched[allMovies[i].id] === true) { seen++; }
+  }
+  var currentList = getCurrentList();
+  var tabSeen = 0;
+  for (i = 0; i < currentList.length; i++) {
+    if (watched[currentList[i].id] === true) { tabSeen++; }
+  }
+  var pct = total > 0 ? Math.round((seen / total) * 100) : 0;
+  document.getElementById('prog-label').textContent = tabSeen + ' / ' + currentList.length + ' en esta lista · ' + seen + ' / ' + total + ' total';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+function toggleWatched(id) {
+  watched[id] = !watched[id];
+  saveAll();
+  updateProgress();
+  var card = document.getElementById('card-' + id);
+  if (card) {
+    if (watched[id]) { card.classList.add('watched'); } else { card.classList.remove('watched'); }
+  }
+}
+
+function setRating(id, val) {
+  ratings[id] = val;
+  saveAll();
+  var starsDiv = document.getElementById('stars-' + id);
+  if (starsDiv) { starsDiv.innerHTML = buildStarsHTML(id); }
+}
+
+function buildStarsHTML(id) {
+  var r = ratings[id] || 0;
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    var cls = i <= r ? 'star on' : 'star';
+    html += '<span class="' + cls + '" onclick="setRating(\'' + id + '\',' + i + ')">★</span>';
+  }
+  return html;
+}
+
+function saveNote(id, val) {
+  notes[id] = val;
+  saveAll();
+}
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+function getCurrentList() {
+  return currentTab === 100 ? top100 : list500;
+}
+
+function getFilterValues() {
+  return {
+    text: document.getElementById('search-input').value.toLowerCase(),
+    country: document.getElementById('filter-country').value,
+    decade: document.getElementById('filter-decade').value,
+    genre: document.getElementById('filter-genre').value,
+    status: statusFilter
+  };
+}
+
+function getDecade(year) {
+  return Math.floor(year / 10) * 10;
+}
+
+function matchesFilters(m, f) {
+  if (f.text) {
+    var s = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
+    if (s.indexOf(f.text) === -1) { return false; }
+  }
+  if (f.country && m.country.indexOf(f.country) === -1) { return false; }
+  if (f.decade && getDecade(m.year) !== parseInt(f.decade)) { return false; }
+  if (f.genre && m.genre.indexOf(f.genre) === -1) { return false; }
+  if (f.status === 'seen' && watched[m.id] !== true) { return false; }
+  if (f.status === 'unseen' && watched[m.id] === true) { return false; }
+  return true;
+}
+
+function applyFilters() {
+  var f = getFilterValues();
+  var list = getCurrentList();
+  var filtered = [];
+  for (var i = 0; i < list.length; i++) {
+    if (matchesFilters(list[i], f)) { filtered.push(list[i]); }
+  }
+  renderList(filtered);
+  document.getElementById('count-info').textContent = filtered.length + ' de ' + list.length + ' películas';
+}
+
+function setStatusFilter(val) {
+  statusFilter = val;
+  var map = {all: 'btn-all', seen: 'btn-seen', unseen: 'btn-unseen'};
+  var keys = ['all', 'seen', 'unseen'];
+  for (var i = 0; i < keys.length; i++) {
+    var btn = document.getElementById(map[keys[i]]);
+    if (btn) {
+      if (keys[i] === val) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+    }
+  }
+  applyFilters();
+}
+
+function buildFilterOptions() {
+  var list = getCurrentList();
+  var countries = {}, decades = {}, genres = {};
+  var i, j, parts, p;
+  for (i = 0; i < list.length; i++) {
+    var m = list[i];
+    parts = m.country.split(' / ');
+    for (j = 0; j < parts.length; j++) { p = parts[j].trim(); if (p) { countries[p] = true; } }
+    decades[getDecade(m.year)] = true;
+    parts = m.genre.split(' / ');
+    for (j = 0; j < parts.length; j++) { p = parts[j].trim(); if (p) { genres[p] = true; } }
+  }
+  var ch = '<option value="">Todos los países</option>';
+  var ca = Object.keys(countries).sort();
+  for (i = 0; i < ca.length; i++) { ch += '<option value="' + ca[i] + '">' + ca[i] + '</option>'; }
+  document.getElementById('filter-country').innerHTML = ch;
+
+  var dh = '<option value="">Todas las décadas</option>';
+  var da = Object.keys(decades).sort();
+  for (i = 0; i < da.length; i++) { dh += '<option value="' + da[i] + '">' + da[i] + 's</option>'; }
+  document.getElementById('filter-decade').innerHTML = dh;
+
+  var gh = '<option value="">Todos los géneros</option>';
+  var ga = Object.keys(genres).sort();
+  for (i = 0; i < ga.length; i++) { gh += '<option value="' + ga[i] + '">' + ga[i] + '</option>'; }
+  document.getElementById('filter-genre').innerHTML = gh;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+/* Intersection Observer for lazy poster loading */
+var posterObserver = null;
+
+function setupObserver() {
+  if (!window.IntersectionObserver) { return; }
+  if (posterObserver) { posterObserver.disconnect(); }
+  posterObserver = new IntersectionObserver(function(entries) {
+    for (var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      if (entry.isIntersecting) {
+        var el = entry.target;
+        var mid = el.getAttribute('data-movie-id');
+        var title = el.getAttribute('data-title');
+        var year = el.getAttribute('data-year');
+        var imgEl = document.getElementById('poster-img-' + mid);
+        var phEl = document.getElementById('poster-ph-' + mid);
+        if (imgEl && !imgEl.src) {
+          fetchPoster(mid, title, year, imgEl, phEl);
+        }
+        posterObserver.unobserve(el);
+      }
+    }
+  }, {rootMargin: '200px'});
+}
+
+function renderList(movies) {
+  setupObserver();
+  var container = document.getElementById('movie-list');
+  var html = '';
+  var i, m, isWatched, note, accentClass, cbChecked, cardClass;
+
+  for (i = 0; i < movies.length; i++) {
+    m = movies[i];
+    isWatched = watched[m.id] === true;
+    note = notes[m.id] || '';
+    accentClass = getAccentClass(m.genre);
+    cbChecked = isWatched ? 'checked' : '';
+    cardClass = isWatched ? 'movie-card watched' : 'movie-card';
+
+    html += '<div class="' + cardClass + '" id="card-' + m.id + '">';
+
+    /* POSTER */
+    html += '<div class="poster-wrap" data-movie-id="' + m.id + '" data-title="' + escapeAttr(m.title) + '" data-year="' + m.year + '">';
+    html += '<div class="poster-loading" id="poster-load-' + m.id + '"><div class="spinner"></div></div>';
+    html += '<img id="poster-img-' + m.id + '" style="display:none" alt="' + escapeAttr(m.title) + '" onerror="handleImgError(\'' + m.id + '\',\'' + escapeAttr(m.title) + '\',' + m.year + ')">';
+    html += '<div id="poster-ph-' + m.id + '" class="poster-placeholder" style="display:none"></div>';
+    html += '<div class="watched-overlay"><span class="watched-check">✓</span></div>';
+    html += '</div>';
+
+    /* ACCENT BAR */
+    html += '<div class="accent-bar ' + accentClass + '"></div>';
+
+    /* CARD BODY */
+    html += '<div class="card-body">';
+    html += '<div class="card-title">' + escapeHtml(m.title) + '</div>';
+    html += '<div class="card-dir">' + escapeHtml(m.dir) + '</div>';
+    html += '<div class="card-tags">';
+    html += '<span class="tag tag-year">' + m.year + '</span>';
+    html += '<span class="tag tag-country">' + escapeHtml(m.country) + '</span>';
+    if (m.stream) { html += '<span class="tag tag-stream">' + escapeHtml(m.stream) + '</span>'; }
+    html += '</div>';
+    html += '<div class="card-stars" id="stars-' + m.id + '">' + buildStarsHTML(m.id) + '</div>';
+    html += '<div class="card-check-row">';
+    html += '<input type="checkbox" class="cb" id="cb-' + m.id + '" ' + cbChecked + ' onchange="toggleWatched(\'' + m.id + '\')">';
+    html += '<label class="card-check-label" for="cb-' + m.id + '">Vista</label>';
+    html += '</div>';
+    html += '<textarea class="card-note" placeholder="Notas..." onchange="saveNote(\'' + m.id + '\',this.value)">' + escapeHtml(note) + '</textarea>';
+
+    /* CURIOUS FACT BUTTON */
+    html += '<button class="curious-btn" id="curious-btn-' + m.id + '" onclick="loadCuriousFact(\'' + m.id + '\',\'' + escapeAttr(m.title) + '\',' + m.year + ',\'' + escapeAttr(m.dir) + '\')">';
+    html += '✦ Dato curioso</button>';
+    html += '<div class="curious-fact" id="curious-div-' + m.id + '" style="display:none"></div>';
+    /* SYNOPSIS */
+    html += '<button class="synopsis-btn" id="synopsis-btn-' + m.id + '" onclick="toggleSynopsis(\'' + m.id + '\')">';
+    html += '◎ Sinopsis</button>';
+    html += '<div class="synopsis-text" id="synopsis-text-' + m.id + '"></div>';
+
+    html += '</div>'; /* card-body */
+    html += '</div>'; /* movie-card */
+  }
+
+  if (movies.length === 0) {
+    html = '<div class="empty"><span class="empty-icon">🎬</span><p>No hay películas con estos filtros.</p></div>';
+  }
+
+  container.innerHTML = html;
+
+  /* Attach observer to poster-wrap elements */
+  if (posterObserver) {
+    var wraps = container.querySelectorAll('.poster-wrap[data-movie-id]');
+    for (var j = 0; j < wraps.length; j++) {
+      posterObserver.observe(wraps[j]);
+    }
+  } else {
+    /* Fallback: load all immediately */
+    var allWraps = container.querySelectorAll('.poster-wrap[data-movie-id]');
+    for (var k = 0; k < allWraps.length; k++) {
+      var w = allWraps[k];
+      var mid2 = w.getAttribute('data-movie-id');
+      var t2 = w.getAttribute('data-title');
+      var y2 = w.getAttribute('data-year');
+      fetchPoster(mid2, t2, y2, document.getElementById('poster-img-' + mid2), document.getElementById('poster-ph-' + mid2));
+    }
+  }
+}
+
+function handleImgError(movieId, title, year) {
+  posterCache[movieId] = 'none';
+  var img = document.getElementById('poster-img-' + movieId);
+  if (img) { img.style.display = 'none'; }
+  var ph = document.getElementById('poster-ph-' + movieId);
+  if (ph) { showPlaceholder(ph, title, year); }
+}
+
+function toggleSynopsis(movieId) {
+  var textEl = document.getElementById('synopsis-text-' + movieId);
+  var btn = document.getElementById('synopsis-btn-' + movieId);
+  if (!textEl) { return; }
+
+  if (textEl.classList.contains('visible')) {
+    textEl.classList.remove('visible');
+    if (btn) { btn.innerHTML = '◎ Sinopsis'; }
+    return;
+  }
+
+  /* If we already have it cached, show immediately */
+  if (synopsisCache[movieId]) {
+    textEl.innerHTML = '<div class="synopsis-label">sinopsis</div>' + escapeHtml(synopsisCache[movieId]);
+    textEl.classList.add('visible');
+    if (btn) { btn.innerHTML = '◎ Ocultar'; }
+    return;
+  }
+
+  /* Not cached yet — fetch it now */
+  if (btn) { btn.innerHTML = '⏳ Cargando...'; }
+  textEl.innerHTML = '<div class="synopsis-label">sinopsis</div><span class="synopsis-loading">Buscando sinopsis...</span>';
+  textEl.classList.add('visible');
+
+  var m = findMovieById(movieId);
+  if (!m) { textEl.innerHTML = '<div class="synopsis-label">sinopsis</div>No disponible.'; return; }
+
+  var query = encodeURIComponent(m.title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + m.year + '&language=es-ES';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var el = document.getElementById('synopsis-text-' + movieId);
+    var btnNow = document.getElementById('synopsis-btn-' + movieId);
+    if (!el) { return; }
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0 && data.results[0].overview) {
+          var overview = data.results[0].overview;
+          synopsisCache[movieId] = overview;
+          /* Also grab poster if we don't have it */
+          if (!posterCache[movieId] && data.results[0].poster_path) {
+            posterCache[movieId] = 'https://image.tmdb.org/t/p/w300' + data.results[0].poster_path;
+          }
+          el.innerHTML = '<div class="synopsis-label">sinopsis</div>' + escapeHtml(overview);
+          if (btnNow) { btnNow.innerHTML = '◎ Ocultar'; }
+        } else {
+          el.innerHTML = '<div class="synopsis-label">sinopsis</div>Sinopsis no disponible en español.';
+          if (btnNow) { btnNow.innerHTML = '◎ Sinopsis'; }
+        }
+      } catch(e) {
+        el.innerHTML = '<div class="synopsis-label">sinopsis</div>No disponible.';
+        if (btnNow) { btnNow.innerHTML = '◎ Sinopsis'; }
+      }
+    } else {
+      el.innerHTML = '<div class="synopsis-label">sinopsis</div>No disponible.';
+      if (btnNow) { btnNow.innerHTML = '◎ Sinopsis'; }
+    }
+  };
+  xhr.send();
+}
+
+function findMovieById(id) {
+  var i;
+  for (i = 0; i < top100.length; i++) { if (top100[i].id === id) { return top100[i]; } }
+  for (i = 0; i < list500.length; i++) { if (list500[i].id === id) { return list500[i]; } }
+  return null;
+}
+
+function escapeHtml(str) {
+  if (!str) { return ''; }
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeAttr(str) {
+  if (!str) { return ''; }
+  return str.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   SWITCH TAB
+   ============================================================ */
+
+function switchTab(tabNum) {
+  currentTab = tabNum;
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-country').value = '';
+  document.getElementById('filter-decade').value = '';
+  document.getElementById('filter-genre').value = '';
+  statusFilter = 'all';
+  setStatusFilter('all');
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < tabBtns.length; i++) { tabBtns[i].classList.remove('active'); }
+  tabBtns[tabNum === 100 ? 0 : 1].classList.add('active');
+  buildFilterOptions();
+  applyFilters();
+  updateProgress();
+}
+
+/* ============================================================
+   RANDOM
+   ============================================================ */
+
+function getFilteredUnwatched() {
+  var f = getFilterValues();
+  var list = getCurrentList();
+  var pool = [];
+  for (var i = 0; i < list.length; i++) {
+    var m = list[i];
+    if (watched[m.id] === true) { continue; }
+    if (f.text) {
+      var s = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
+      if (s.indexOf(f.text) === -1) { continue; }
+    }
+    if (f.country && m.country.indexOf(f.country) === -1) { continue; }
+    if (f.decade && getDecade(m.year) !== parseInt(f.decade)) { continue; }
+    if (f.genre && m.genre.indexOf(f.genre) === -1) { continue; }
+    pool.push(m);
+  }
+  return pool;
+}
+
+function pickRandom() {
+  var pool = getFilteredUnwatched();
+  var resultDiv = document.getElementById('random-result');
+  document.getElementById('random-modal').classList.add('open');
+
+  if (pool.length === 0) {
+    resultDiv.innerHTML = '<div class="no-random">🎉 Ya viste todo con estos filtros.<br><small style="color:var(--gray2)">Prueba quitando algún filtro.</small></div>';
+    return;
+  }
+
+  if (lastRandomPool.length === 0 || lastRandomPool.length !== pool.length) {
+    lastRandomPool = pool.slice();
+  }
+
+  var idx = Math.floor(Math.random() * lastRandomPool.length);
+  var m = lastRandomPool[idx];
+  lastRandomPool.splice(idx, 1);
+
+  var accentClass = getAccentClass(m.genre);
+  var cbChecked = watched[m.id] ? 'checked' : '';
+  var starsHtml = buildStarsHTML(m.id);
+
+  resultDiv.innerHTML = '<div style="margin:16px 0">'
+    + '<div class="accent-bar ' + accentClass + '" style="border-radius:4px;margin-bottom:16px"></div>'
+    + '<div class="random-movie-display">'
+    + '<div class="random-poster">'
+    + '<div class="poster-loading" id="r-spin-' + m.id + '"><div class="spinner"></div></div>'
+    + '<img id="r-img-' + m.id + '" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:10px" alt="' + escapeAttr(m.title) + '">'
+    + '<div id="r-ph-' + m.id + '" class="random-poster-placeholder" style="display:none">' + m.year + '</div>'
+    + '</div>'
+    + '<div class="random-info">'
+    + '<div class="random-title">' + escapeHtml(m.title) + '</div>'
+    + '<div class="random-dir">' + escapeHtml(m.dir) + ' · ' + m.year + '</div>'
+    + '<div class="random-tags">'
+    + '<span class="tag tag-country">' + escapeHtml(m.country) + '</span>'
+    + '<span class="tag tag-stream">' + escapeHtml(m.stream) + '</span>'
+    + '</div>'
+    + '<div id="random-stars-' + m.id + '" style="display:flex;gap:3px;margin-bottom:10px">' + starsHtml + '</div>'
+    + '<div class="random-check-row">'
+    + '<input type="checkbox" class="cb" id="r-cb-' + m.id + '" ' + cbChecked + ' onchange="toggleWatchedRandom(\'' + m.id + '\')">'
+    + '<label for="r-cb-' + m.id + '" style="font-size:0.78rem;color:var(--gray);cursor:pointer">Marcar como vista</label>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="random-synopsis" id="r-synopsis-' + m.id + '">'
+    + '<div class="random-synopsis-label">sinopsis</div>'
+    + '<span id="r-synopsis-text-' + m.id + '" style="color:var(--gray);font-style:italic">Cargando...</span>'
+    + '</div>'
+    + '<div class="random-fact" id="r-fact-' + m.id + '">'
+    + '<div class="random-fact-label">✦ dato curioso</div>'
+    + '<div class="random-fact-loading" id="r-fact-text-' + m.id + '">Cargando dato curioso...</div>'
+    + '</div>'
+    + '<div class="random-btns">'
+    + '<button class="btn-reroll" onclick="pickRandom()">🎲 Otra película</button>'
+    + '</div>'
+    + '<div class="random-remaining">' + lastRandomPool.length + ' películas más sin ver con estos filtros</div>'
+    + '</div>';
+
+  /* Load poster for random */
+  var rImg = document.getElementById('r-img-' + m.id);
+  var rPh = document.getElementById('r-ph-' + m.id);
+  var rSpin = document.getElementById('r-spin-' + m.id);
+  if (rImg) {
+    fetchPosterForRandom(m.id, m.title, m.year, rImg, rPh, rSpin);
+  }
+
+  /* Load curious fact automatically in random */
+  fetchRandomFact(m.id, m.title, m.year, m.dir);
+  fetchRandomSynopsis(m.id, m.title, m.year);
+}
+
+function fetchPosterForRandom(movieId, title, year, imgEl, phEl, spinEl) {
+  if (posterCache[movieId] && posterCache[movieId] !== 'none') {
+    if (spinEl) { spinEl.style.display = 'none'; }
+    imgEl.src = posterCache[movieId];
+    imgEl.style.display = 'block';
+    if (phEl) { phEl.style.display = 'none'; }
+    return;
+  }
+  if (posterCache[movieId] === 'none') {
+    if (spinEl) { spinEl.style.display = 'none'; }
+    if (phEl) { phEl.style.display = 'block'; }
+    return;
+  }
+  var query = encodeURIComponent(title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + year + '&language=es-ES';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    if (spinEl) { spinEl.style.display = 'none'; }
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0 && data.results[0].poster_path) {
+          var posterUrl = 'https://image.tmdb.org/t/p/w300' + data.results[0].poster_path;
+          posterCache[movieId] = posterUrl;
+          imgEl.src = posterUrl;
+          imgEl.style.display = 'block';
+          if (phEl) { phEl.style.display = 'none'; }
+        } else {
+          posterCache[movieId] = 'none';
+          if (phEl) { phEl.style.display = 'block'; }
+        }
+      } catch(e) {
+        if (phEl) { phEl.style.display = 'block'; }
+      }
+    } else {
+      if (phEl) { phEl.style.display = 'block'; }
+    }
+  };
+  xhr.send();
+}
+
+function fetchRandomSynopsis(movieId, title, year) {
+  var el = document.getElementById('r-synopsis-text-' + movieId);
+  if (!el) { return; }
+
+  /* Already cached */
+  if (synopsisCache[movieId]) {
+    el.textContent = synopsisCache[movieId];
+    el.style.fontStyle = 'normal';
+    el.style.color = 'var(--white)';
+    return;
+  }
+
+  var query = encodeURIComponent(title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + year + '&language=es-ES';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var elNow = document.getElementById('r-synopsis-text-' + movieId);
+    if (!elNow) { return; }
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0 && data.results[0].overview) {
+          synopsisCache[movieId] = data.results[0].overview;
+          elNow.textContent = data.results[0].overview;
+          elNow.style.fontStyle = 'normal';
+          elNow.style.color = 'var(--white)';
+        } else {
+          elNow.textContent = 'Sinopsis no disponible.';
+        }
+      } catch(e) {
+        elNow.textContent = 'No disponible.';
+      }
+    } else {
+      elNow.textContent = 'No disponible.';
+    }
+  };
+  xhr.send();
+}
+
+function fetchRandomFact(movieId, title, year, dir) {
+  var el = document.getElementById('r-fact-text-' + movieId);
+  if (!el) { return; }
+
+  /* Check pre-written facts first */
+  if (facts[movieId]) {
+    el.textContent = facts[movieId];
+    el.className = '';
+    return;
+  }
+
+  /* Fetch via corsproxy */
+  var prompt = 'Dame UN solo dato curioso o poco conocido sobre la pelicula "' + title + '" (' + year + ') de ' + dir + '. Maximo 2 oraciones directas. Sin introduccion ni comillas.';
+
+  fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 200,
+      messages: [{role: 'user', content: prompt}]
+    })
+  }).then(function(res) { return res.json(); })
+  .then(function(data) {
+    var elNow = document.getElementById('r-fact-text-' + movieId);
+    if (!elNow) { return; }
+    var text = '';
+    if (data.content && data.content.length > 0) {
+      for (var i = 0; i < data.content.length; i++) {
+        if (data.content[i].type === 'text') { text = data.content[i].text; break; }
+      }
+    }
+    elNow.textContent = text || 'Sin dato disponible.';
+    elNow.className = '';
+    if (text) { facts[movieId] = text; }
+  }).catch(function() {
+    var elNow = document.getElementById('r-fact-text-' + movieId);
+    if (elNow) { elNow.textContent = 'No disponible.'; elNow.className = ''; }
+  });
+}
+
+function toggleWatchedRandom(id) {
+  toggleWatched(id);
+  var rStars = document.getElementById('random-stars-' + id);
+  if (rStars) { rStars.innerHTML = buildStarsHTML(id); }
+}
+
+function closeRandomModal() {
+  document.getElementById('random-modal').classList.remove('open');
+  lastRandomPool = [];
+}
+
+/* ============================================================
+   EXPORT / IMPORT / RESET
+   ============================================================ */
+
+function exportProgress() {
+  var data = JSON.stringify({watched: watched, ratings: ratings, notes: notes}, null, 2);
+  var blob = new Blob([data], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'cineteque-progreso.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function openImportModal() { document.getElementById('import-modal').classList.add('open'); }
+function closeImportModal() { document.getElementById('import-modal').classList.remove('open'); document.getElementById('import-text').value = ''; }
+
+function doImport() {
+  var txt = document.getElementById('import-text').value.trim();
+  if (!txt) { alert('Pega el JSON primero.'); return; }
+  try {
+    var data = JSON.parse(txt);
+    if (data.watched) { watched = data.watched; }
+    if (data.ratings) { ratings = data.ratings; }
+    if (data.notes) { notes = data.notes; }
+    saveAll();
+    closeImportModal();
+    applyFilters();
+    updateProgress();
+    alert('¡Progreso importado!');
+  } catch(e) { alert('JSON inválido.'); }
+}
+
+function clearAllProgress() {
+  if (!confirm('¿Borrar todo el progreso?')) { return; }
+  watched = {}; ratings = {}; notes = {};
+  saveAll();
+  applyFilters();
+  updateProgress();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+loadAll();
+buildFilterOptions();
+applyFilters();
+updateProgress();
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeImportModal(); closeRandomModal(); }
+});
+document.getElementById('import-modal').addEventListener('click', function(e) {
+  if (e.target === this) { closeImportModal(); }
+});
+document.getElementById('random-modal').addEventListener('click', function(e) {
+  if (e.target === this) { closeRandomModal(); }
+});
+
+</script>
+</body>
+</html>
