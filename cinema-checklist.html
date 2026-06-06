@@ -3,150 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cineteque — Tu Checklist de Cine</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Cineteque</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0f;
-  --bg2:#12121a;
-  --bg3:#1a1a26;
-  --gold:#f4d03f;
-  --gold2:#e8b94a;
+  --bg:#0c0c10;
+  --bg2:#141418;
+  --bg3:#1c1c22;
+  --gold:#f5c518;
+  --coral:#ff6b6b;
+  --mint:#4ecdc4;
+  --lavender:#c77dff;
   --white:#f0ece0;
-  --gray:#888;
-  --gray2:#555;
-  --red:#e74c3c;
-  --green:#2ecc71;
-  --border:#2a2a3a;
+  --gray:#999;
+  --gray2:#444;
+  --border:#252530;
+  --card-radius:16px;
 }
-html,body{background:var(--bg);color:var(--white);font-family:'Work Sans',sans-serif;min-height:100vh;font-size:15px}
-a{color:var(--gold);text-decoration:none}
+html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;font-size:15px;overflow-x:hidden}
+
+/* GRAIN OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4}
 
 /* HEADER */
-.header{background:linear-gradient(180deg,#0a0a0f 0%,#12121a 100%);border-bottom:1px solid var(--border);padding:18px 20px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.6)}
-.header-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.logo{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);letter-spacing:2px;font-style:italic}
-.logo span{color:var(--white);font-style:normal;font-size:0.9rem;display:block;font-family:'Work Sans',sans-serif;letter-spacing:4px;text-transform:uppercase;opacity:0.7;margin-top:-4px}
-
-/* PROGRESS */
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:16px 24px 12px;position:sticky;top:0;z-index:100;box-shadow:0 4px 40px rgba(0,0,0,0.8)}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo-wrap{display:flex;flex-direction:column;gap:0}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--white);letter-spacing:6px;line-height:1;display:flex;align-items:center;gap:10px}
+.logo-dot{width:10px;height:10px;background:var(--coral);border-radius:50%;display:inline-block;margin-bottom:4px;box-shadow:0 0 14px var(--coral)}
+.logo-sub{font-size:0.68rem;letter-spacing:5px;text-transform:uppercase;color:var(--gray);font-weight:300;margin-top:2px}
+.tabs{display:flex;gap:6px}
+.tab-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.75rem;padding:6px 16px;border-radius:30px;cursor:pointer;transition:all 0.2s;letter-spacing:2px;text-transform:uppercase;font-weight:500}
+.tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
 .progress-wrap{margin-top:12px}
-.progress-info{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--gray);margin-bottom:5px}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:2px;transition:width 0.4s ease}
-
-/* TABS */
-.tabs{display:flex;gap:8px;margin-top:14px}
-.tab-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Work Sans',sans-serif;font-size:0.8rem;padding:7px 18px;border-radius:20px;cursor:pointer;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase}
-.tab-btn.active{background:var(--gold);color:#0a0a0f;border-color:var(--gold);font-weight:600}
+.progress-info{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--gray);margin-bottom:5px;letter-spacing:0.5px}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--gold));border-radius:2px;transition:width 0.5s cubic-bezier(.4,0,.2,1)}
 
 /* FILTERS */
-.filters{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.search-box{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Work Sans',sans-serif;font-size:0.88rem;padding:9px 14px;border-radius:8px;outline:none;transition:border-color 0.2s}
-.search-box:focus{border-color:var(--gold2)}
+.filters{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search-box{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.85rem;padding:9px 14px;border-radius:10px;outline:none;transition:border-color 0.2s}
+.search-box:focus{border-color:var(--gold)}
 .search-box::placeholder{color:var(--gray2)}
-.filter-select{background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Work Sans',sans-serif;font-size:0.82rem;padding:9px 12px;border-radius:8px;outline:none;cursor:pointer}
+.filter-select{background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.8rem;padding:9px 10px;border-radius:10px;outline:none;cursor:pointer}
 .filter-select option{background:var(--bg3)}
-.filter-btns{display:flex;gap:6px;flex-wrap:wrap}
-.filter-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Work Sans',sans-serif;font-size:0.78rem;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all 0.2s}
-.filter-btn.active{background:var(--gold);color:#0a0a0f;border-color:var(--gold);font-weight:600}
+.filter-btns{display:flex;gap:5px;flex-wrap:wrap}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.72rem;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase}
+.filter-btn.active{background:var(--mint);color:#000;border-color:var(--mint);font-weight:700}
 
 /* ACTIONS */
-.actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
-.action-btn{background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Work Sans',sans-serif;font-size:0.78rem;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;padding:10px 24px;background:var(--bg);border-bottom:1px solid var(--border)}
+.action-btn{background:var(--bg3);border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:0.72rem;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;font-weight:500}
 .action-btn:hover{border-color:var(--gold);color:var(--gold)}
-.action-btn-random{border-color:var(--gold2);color:var(--gold);font-weight:600}
-.action-btn-random:hover{background:var(--gold);color:#0a0a0f}
+.action-btn-random{border-color:var(--coral);color:var(--coral);font-weight:700}
+.action-btn-random:hover{background:var(--coral);color:#000}
 
-/* RANDOM MODAL */
-.random-card{background:var(--bg3);border:1px solid var(--gold2);border-radius:10px;padding:22px;margin-top:16px}
-.random-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);margin-bottom:8px;line-height:1.3}
-.random-meta{font-size:0.8rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.random-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.btn-watch-now{background:var(--gold);color:#0a0a0f;border:none;font-family:'Work Sans',sans-serif;font-size:0.85rem;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer}
-.btn-reroll{background:var(--bg2);color:var(--white);border:1px solid var(--border);font-family:'Work Sans',sans-serif;font-size:0.85rem;padding:9px 20px;border-radius:8px;cursor:pointer}
-.btn-reroll:hover{border-color:var(--gold);color:var(--gold)}
-.no-random{color:var(--gray);font-size:0.9rem;margin-top:12px;text-align:center;padding:20px 0}
+/* MAIN GRID */
+.main{padding:24px;max-width:1100px;margin:0 auto}
+.count-info{font-size:0.75rem;color:var(--gray);padding:0 0 16px;letter-spacing:1px;text-transform:uppercase}
 
-/* MAIN LIST */
-.main{padding:0 20px 40px;max-width:1000px;margin:0 auto}
-.list-header{font-size:0.72rem;color:var(--gray);letter-spacing:2px;text-transform:uppercase;padding:16px 0 8px;border-bottom:1px solid var(--border);margin-bottom:2px}
-.count-info{font-size:0.8rem;color:var(--gray);padding:10px 0 6px}
+/* MOVIE GRID */
+.movie-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
 
 /* MOVIE CARD */
-.movie-card{border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;transition:background 0.15s}
-.movie-card:hover{background:rgba(244,208,63,0.03)}
-.movie-card.watched{opacity:0.7}
+.movie-card{background:var(--bg2);border-radius:var(--card-radius);overflow:hidden;border:1px solid var(--border);transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative;cursor:pointer}
+.movie-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.6);border-color:var(--gray2)}
+.movie-card.watched{opacity:0.55}
+.movie-card.watched:hover{opacity:0.85}
 
-/* CHECKBOX */
-.cb-wrap{display:flex;align-items:center;justify-content:center;padding-top:2px;min-width:44px;min-height:44px}
-.cb{width:22px;height:22px;border-radius:5px;border:2px solid var(--gray2);background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;position:relative;transition:all 0.2s;flex-shrink:0}
-.cb:checked{background:var(--gold);border-color:var(--gold)}
-.cb:checked::after{content:'';position:absolute;left:5px;top:2px;width:8px;height:12px;border:2px solid #0a0a0f;border-top:none;border-left:none;transform:rotate(45deg)}
+/* POSTER */
+.poster-wrap{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--bg3)}
+.poster-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s}
+.movie-card:hover .poster-img{transform:scale(1.04)}
+.poster-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;text-align:center}
+.poster-placeholder-year{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--border);letter-spacing:3px}
+.poster-placeholder-title{font-family:'Playfair Display',serif;font-size:0.75rem;color:var(--gray2);line-height:1.3;font-style:italic}
+.poster-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
 
-/* MOVIE INFO */
-.movie-info{}
-.movie-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--white);line-height:1.3;margin-bottom:3px}
-.movie-card.watched .movie-title{color:var(--gold);text-decoration:line-through;text-decoration-color:rgba(244,208,63,0.5)}
-.movie-meta{font-size:0.75rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.badge{background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:3px;font-size:0.68rem;letter-spacing:0.5px;white-space:nowrap}
-.badge-country{color:#7ecfff}
-.badge-genre{color:#b388ff}
-.badge-stream{color:var(--green)}
-.badge-year{color:var(--gold2)}
+/* WATCHED OVERLAY */
+.watched-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.movie-card.watched .watched-overlay{opacity:1}
+.watched-check{font-size:2rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8))}
 
-/* STARS */
-.stars{display:flex;gap:3px;margin-bottom:7px}
-.star{font-size:1.1rem;color:var(--gray2);cursor:pointer;transition:color 0.15s;min-width:22px;min-height:22px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+/* ACCENT BAR — color by genre */
+.accent-bar{height:3px;width:100%}
+
+/* CARD BODY */
+.card-body{padding:12px}
+.card-title{font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:700;line-height:1.3;margin-bottom:4px;color:var(--white)}
+.card-dir{font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-weight:300}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tag{font-size:0.62rem;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;font-weight:600;text-transform:uppercase}
+.tag-year{background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid rgba(245,197,24,0.2)}
+.tag-country{background:rgba(78,205,196,0.12);color:var(--mint);border:1px solid rgba(78,205,196,0.2)}
+.tag-stream{background:rgba(255,107,107,0.12);color:var(--coral);border:1px solid rgba(255,107,107,0.2)}
+
+/* STARS in card */
+.card-stars{display:flex;gap:2px;margin-bottom:8px}
+.star{font-size:0.95rem;color:var(--gray2);cursor:pointer;transition:color 0.15s;min-width:20px;min-height:24px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .star.on{color:var(--gold)}
-.star:hover{color:var(--gold2)}
 
-/* NOTES */
-.note-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Work Sans',sans-serif;font-size:0.8rem;padding:7px 10px;border-radius:6px;resize:vertical;min-height:40px;outline:none;transition:border-color 0.2s;line-height:1.4}
-.note-input:focus{border-color:var(--gold2)}
-.note-input::placeholder{color:var(--gray2)}
+/* CHECKBOX in card */
+.card-check-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.cb{width:20px;height:20px;border-radius:5px;border:2px solid var(--gray2);background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;position:relative;transition:all 0.2s;flex-shrink:0}
+.cb:checked{background:var(--mint);border-color:var(--mint)}
+.cb:checked::after{content:'';position:absolute;left:4px;top:1px;width:8px;height:11px;border:2px solid #000;border-top:none;border-left:none;transform:rotate(45deg)}
+.card-check-label{font-size:0.72rem;color:var(--gray);cursor:pointer;user-select:none}
 
-/* NUMBER badge */
-.num-badge{font-family:'Playfair Display',serif;font-size:0.72rem;color:var(--gray2);min-width:28px;text-align:right;margin-top:5px;font-style:italic}
+/* NOTE */
+.card-note{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.75rem;padding:7px 9px;border-radius:8px;resize:none;min-height:38px;outline:none;transition:border-color 0.2s;line-height:1.4;margin-top:8px}
+.card-note:focus{border-color:var(--gold)}
+.card-note::placeholder{color:var(--gray2)}
+
+/* CURIOUS FACT */
+.curious-btn{width:100%;background:transparent;border:1px dashed var(--border);color:var(--lavender);font-family:'Space Grotesk',sans-serif;font-size:0.7rem;padding:6px 10px;border-radius:8px;cursor:pointer;transition:all 0.2s;margin-top:6px;letter-spacing:0.5px;text-align:left;display:flex;align-items:center;gap:6px}
+.curious-btn:hover{border-color:var(--lavender);background:rgba(199,125,255,0.06)}
+.curious-btn.loading-fact{color:var(--gray);cursor:wait}
+.curious-fact{background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.2);border-radius:8px;padding:10px;margin-top:6px;font-size:0.75rem;line-height:1.5;color:var(--white);position:relative}
+.curious-fact-close{position:absolute;top:6px;right:8px;color:var(--gray);cursor:pointer;font-size:0.8rem;background:none;border:none;font-family:inherit;padding:0}
+.curious-fact-label{font-size:0.62rem;color:var(--lavender);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-weight:600}
 
 /* EMPTY STATE */
-.empty{text-align:center;padding:60px 20px;color:var(--gray)}
-.empty-icon{font-size:3rem;margin-bottom:12px}
-.empty p{font-size:0.9rem;line-height:1.6}
+.empty{text-align:center;padding:80px 20px;color:var(--gray);grid-column:1/-1}
+.empty-icon{font-size:3rem;margin-bottom:16px;display:block}
 
 /* ALERT */
-.alert{background:#1a0a0a;border:1px solid var(--red);color:var(--red);padding:14px 20px;margin:12px 20px;border-radius:8px;font-size:0.85rem;display:none}
+.alert{background:#1a0a0a;border:1px solid var(--coral);color:var(--coral);padding:12px 20px;margin:10px 24px;border-radius:10px;font-size:0.82rem;display:none}
 
-/* MODAL for import */
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:500px;width:100%}
-.modal h3{font-family:'Playfair Display',serif;color:var(--gold);margin-bottom:14px}
-.modal textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Work Sans',sans-serif;font-size:0.8rem;padding:10px;border-radius:8px;min-height:120px;outline:none;resize:vertical}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:500px;width:100%}
+.modal h3{font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:1.4rem;color:var(--gold);margin-bottom:6px}
+.modal p{font-size:0.8rem;color:var(--gray);margin-bottom:14px}
+.modal textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:0.8rem;padding:10px;border-radius:10px;min-height:120px;outline:none;resize:vertical}
 .modal-btns{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
-.btn-primary{background:var(--gold);color:#0a0a0f;border:none;font-family:'Work Sans',sans-serif;font-size:0.85rem;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer}
-.btn-secondary{background:transparent;color:var(--gray);border:1px solid var(--border);font-family:'Work Sans',sans-serif;font-size:0.85rem;padding:9px 20px;border-radius:8px;cursor:pointer}
+.btn-primary{background:var(--gold);color:#000;border:none;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;padding:9px 22px;border-radius:10px;cursor:pointer}
+.btn-secondary{background:transparent;color:var(--gray);border:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-size:0.85rem;padding:9px 22px;border-radius:10px;cursor:pointer}
+.btn-secondary:hover{color:var(--white)}
+
+/* RANDOM MODAL */
+.random-movie-display{display:grid;grid-template-columns:120px 1fr;gap:16px;margin:16px 0;align-items:start}
+.random-poster{width:120px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--bg3);flex-shrink:0}
+.random-poster img{width:100%;height:100%;object-fit:cover}
+.random-poster-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--border);letter-spacing:2px}
+.random-info{}
+.random-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--white);margin-bottom:4px;line-height:1.3;font-weight:700}
+.random-dir{font-size:0.78rem;color:var(--gray);margin-bottom:10px}
+.random-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.random-fact{background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.78rem;line-height:1.5;color:var(--white)}
+.random-fact-label{font-size:0.62rem;color:var(--lavender);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:600}
+.random-fact-loading{color:var(--gray);font-style:italic;font-size:0.78rem}
+.random-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-reroll{background:var(--bg3);color:var(--white);border:1px solid var(--border);font-family:'Space Grotesk',sans-serif;font-size:0.82rem;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:500}
+.btn-reroll:hover{border-color:var(--coral);color:var(--coral)}
+.random-check-row{display:flex;align-items:center;gap:8px}
+.random-remaining{font-size:0.68rem;color:var(--gray2);margin-top:10px;text-align:right;letter-spacing:0.5px}
+.no-random{color:var(--gray);text-align:center;padding:30px 0;font-size:0.9rem;line-height:1.8}
+
+/* GENRE COLOR ACCENTS */
+.accent-drama{background:linear-gradient(90deg,#c77dff,#9d4edd)}
+.accent-terror{background:linear-gradient(90deg,#ff6b6b,#ee3333)}
+.accent-doc{background:linear-gradient(90deg,#4ecdc4,#2ab5ac)}
+.accent-comedia{background:linear-gradient(90deg,#f5c518,#e6a817)}
+.accent-sci{background:linear-gradient(90deg,#74c0fc,#4dabf7)}
+.accent-accion{background:linear-gradient(90deg,#ff922b,#f76707)}
+.accent-romance{background:linear-gradient(90deg,#f783ac,#e64980)}
+.accent-mudo{background:linear-gradient(90deg,#868e96,#495057)}
+.accent-anime{background:linear-gradient(90deg,#63e6be,#20c997)}
+.accent-default{background:linear-gradient(90deg,#444,#333)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.movie-card{animation:fadeIn 0.3s ease both}
 
 @media(max-width:600px){
-  .logo{font-size:1.4rem}
-  .filters{gap:8px}
-  .search-box{min-width:100%;flex:none}
-  .movie-card{grid-template-columns:44px 1fr}
-  .num-badge{display:none}
-  .movie-title{font-size:0.95rem}
-  .main{padding:0 14px 40px}
-  .header{padding:14px 14px 10px}
-  .filters,.actions{padding:10px 14px}
+  .movie-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+  .main{padding:16px}
+  .header{padding:12px 16px 10px}
+  .filters,.actions{padding:10px 16px}
+  .logo{font-size:1.9rem}
+  .random-movie-display{grid-template-columns:90px 1fr;gap:12px}
+  .random-poster{width:90px}
 }
 </style>
 </head>
 <body>
 
-<div id="ls-alert" class="alert">⚠ localStorage no disponible. Tu progreso NO se guardará entre sesiones.</div>
+<div id="ls-alert" class="alert">⚠ localStorage no disponible. Tu progreso NO se guardará.</div>
 
 <div class="header">
   <div class="header-top">
-    <div class="logo">Cineteque<span>checklist de cine</span></div>
+    <div class="logo-wrap">
+      <div class="logo"><span class="logo-dot"></span>CINETEQUE</div>
+      <div class="logo-sub">tu checklist de cine mundial</div>
+    </div>
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab(100)">Top 100</button>
       <button class="tab-btn" onclick="switchTab(500)">Lista 500</button>
@@ -162,16 +215,10 @@ a{color:var(--gold);text-decoration:none}
 </div>
 
 <div class="filters">
-  <input class="search-box" type="text" id="search-input" placeholder="Buscar por título, director..." oninput="applyFilters()">
-  <select class="filter-select" id="filter-country" onchange="applyFilters()">
-    <option value="">Todos los países</option>
-  </select>
-  <select class="filter-select" id="filter-decade" onchange="applyFilters()">
-    <option value="">Todas las décadas</option>
-  </select>
-  <select class="filter-select" id="filter-genre" onchange="applyFilters()">
-    <option value="">Todos los géneros</option>
-  </select>
+  <input class="search-box" type="text" id="search-input" placeholder="Buscar título, director..." oninput="applyFilters()">
+  <select class="filter-select" id="filter-country" onchange="applyFilters()"><option value="">Todos los países</option></select>
+  <select class="filter-select" id="filter-decade" onchange="applyFilters()"><option value="">Todas las décadas</option></select>
+  <select class="filter-select" id="filter-genre" onchange="applyFilters()"><option value="">Todos los géneros</option></select>
   <div class="filter-btns">
     <button class="filter-btn active" id="btn-all" onclick="setStatusFilter('all')">Todas</button>
     <button class="filter-btn" id="btn-seen" onclick="setStatusFilter('seen')">Vistas</button>
@@ -180,30 +227,30 @@ a{color:var(--gold);text-decoration:none}
 </div>
 
 <div class="actions">
-  <button class="action-btn action-btn-random" onclick="pickRandom()">🎲 Película random</button>
-  <button class="action-btn" onclick="exportProgress()">↓ Exportar JSON</button>
-  <button class="action-btn" onclick="openImportModal()">↑ Importar JSON</button>
-  <button class="action-btn" onclick="clearAllProgress()">✕ Resetear todo</button>
+  <button class="action-btn action-btn-random" onclick="pickRandom()">🎲 Random</button>
+  <button class="action-btn" onclick="exportProgress()">↓ Exportar</button>
+  <button class="action-btn" onclick="openImportModal()">↑ Importar</button>
+  <button class="action-btn" onclick="clearAllProgress()">✕ Resetear</button>
 </div>
 
 <div class="main">
   <div class="count-info" id="count-info"></div>
-  <div id="movie-list"></div>
+  <div class="movie-grid" id="movie-list"></div>
 </div>
 
 <div class="modal-overlay" id="random-modal">
-  <div class="modal" style="max-width:520px">
-    <h3>🎲 Película Random</h3>
-    <p style="font-size:0.8rem;color:var(--gray);margin-top:4px">Respeta los filtros activos. Solo muestra películas que no has visto.</p>
+  <div class="modal" style="max-width:560px">
+    <h3>Película Random</h3>
+    <p id="random-subtitle">Solo películas no vistas · respeta filtros activos</p>
     <div id="random-result"></div>
-    <div class="modal-btns" style="margin-top:10px">
-      <button class="btn-secondary" onclick="closeRandomModal()">Cerrar</button>
-    </div>
+    <div class="modal-btns"><button class="btn-secondary" onclick="closeRandomModal()">Cerrar</button></div>
   </div>
 </div>
+
+<div class="modal-overlay" id="import-modal">
   <div class="modal">
     <h3>Importar Progreso</h3>
-    <p style="font-size:0.82rem;color:var(--gray);margin-bottom:12px">Pega el JSON exportado previamente:</p>
+    <p>Pega el JSON exportado previamente:</p>
     <textarea id="import-text" placeholder='{"watched":{},"ratings":{},"notes":{}}'></textarea>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closeImportModal()">Cancelar</button>
@@ -214,26 +261,20 @@ a{color:var(--gold);text-decoration:none}
 
 <script>
 /* ============================================================
-   CINETEQUE — Movie Checklist
-   Reglas técnicas:
-   - CERO backticks / template literals
-   - CERO arrow functions en métodos críticos
-   - localStorage con try/catch al inicio
-   - Guardado inmediato tras cada acción
-   - Filtro "Vistas" lee de objeto en memoria, no del DOM
+   CINETEQUE v2 — Reglas: CERO backticks, CERO arrow functions
    ============================================================ */
 
 var LS_KEY = 'cineteque_v1';
 var lsAvailable = false;
 var currentTab = 100;
 var statusFilter = 'all';
-
-/* Estado en memoria */
 var watched = {};
 var ratings = {};
 var notes = {};
+var posterCache = {};
+var lastRandomPool = [];
 
-/* ---- TEST localStorage AL INICIO ---- */
+/* ---- TEST localStorage ---- */
 try {
   var testKey = '__cine_test__';
   localStorage.setItem(testKey, '1');
@@ -244,7 +285,6 @@ try {
   document.getElementById('ls-alert').style.display = 'block';
 }
 
-/* ---- DATOS: TOP 100 ---- */
 var top100 = [
   {id:'t1',title:'2001: A Space Odyssey',year:1968,dir:'Stanley Kubrick',country:'Reino Unido',genre:'Ciencia Ficción',stream:'Max'},
   {id:'t2',title:'La Passion de Jeanne d\'Arc',year:1928,dir:'Carl Theodor Dreyer',country:'Francia',genre:'Drama / Cine Mudo',stream:'YouTube (dominio público)'},
@@ -894,24 +934,178 @@ var list500 = [
   {id:'m500',title:'Burning (Beoning)',year:2018,dir:'Lee Chang-dong',country:'Corea del Sur',genre:'Drama / Thriller / Misterio',stream:'MUBI'}
 ];
 
-
 /* ============================================================
-   FUNCIONES DE DATOS Y ESTADO
+   TMDB POSTER FETCH
+   Uses TMDB public search — no API key needed for basic search
+   Falls back to placeholder gracefully
    ============================================================ */
 
-function getCurrentList() {
-  if (currentTab === 100) { return top100; }
-  return list500;
+var TMDB_KEY = '2dca580c2a14b55200e784d157207b4d'; /* public demo key */
+
+function fetchPoster(movieId, title, year, imgEl, placeholderEl) {
+  if (posterCache[movieId]) {
+    if (posterCache[movieId] === 'none') {
+      showPlaceholder(placeholderEl, title, year);
+    } else {
+      imgEl.src = posterCache[movieId];
+      imgEl.style.display = 'block';
+      if (placeholderEl) { placeholderEl.style.display = 'none'; }
+    }
+    /* hide spinner */
+    var spinner = imgEl.parentNode.querySelector('.poster-loading');
+    if (spinner) { spinner.style.display = 'none'; }
+    return;
+  }
+
+  var query = encodeURIComponent(title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + year + '&language=en-US';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var spinner = imgEl.parentNode ? imgEl.parentNode.querySelector('.poster-loading') : null;
+    if (spinner) { spinner.style.display = 'none'; }
+
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0 && data.results[0].poster_path) {
+          var posterUrl = 'https://image.tmdb.org/t/p/w300' + data.results[0].poster_path;
+          posterCache[movieId] = posterUrl;
+          /* Check if element is still in DOM */
+          var currentImg = document.getElementById('poster-img-' + movieId);
+          if (currentImg) {
+            currentImg.src = posterUrl;
+            currentImg.style.display = 'block';
+            var ph = document.getElementById('poster-ph-' + movieId);
+            if (ph) { ph.style.display = 'none'; }
+          }
+        } else {
+          posterCache[movieId] = 'none';
+          var ph2 = document.getElementById('poster-ph-' + movieId);
+          if (ph2) { showPlaceholder(ph2, title, year); }
+        }
+      } catch(e) {
+        posterCache[movieId] = 'none';
+        var ph3 = document.getElementById('poster-ph-' + movieId);
+        if (ph3) { showPlaceholder(ph3, title, year); }
+      }
+    } else {
+      posterCache[movieId] = 'none';
+      var ph4 = document.getElementById('poster-ph-' + movieId);
+      if (ph4) { showPlaceholder(ph4, title, year); }
+    }
+  };
+  xhr.send();
 }
+
+function showPlaceholder(el, title, year) {
+  if (!el) { return; }
+  el.style.display = 'flex';
+  el.innerHTML = '<div class="poster-placeholder-year">' + year + '</div>'
+    + '<div class="poster-placeholder-title">' + escapeHtml(title) + '</div>';
+}
+
+/* ============================================================
+   GENRE → ACCENT COLOR
+   ============================================================ */
+
+function getAccentClass(genre) {
+  var g = genre.toLowerCase();
+  if (g.indexOf('terror') !== -1 || g.indexOf('horror') !== -1) { return 'accent-terror'; }
+  if (g.indexOf('mudo') !== -1 || g.indexOf('silente') !== -1) { return 'accent-mudo'; }
+  if (g.indexOf('documental') !== -1) { return 'accent-doc'; }
+  if (g.indexOf('comedia') !== -1) { return 'accent-comedia'; }
+  if (g.indexOf('ciencia ficción') !== -1 || g.indexOf('sci') !== -1) { return 'accent-sci'; }
+  if (g.indexOf('acción') !== -1 || g.indexOf('accion') !== -1) { return 'accent-accion'; }
+  if (g.indexOf('romance') !== -1 || g.indexOf('romántic') !== -1) { return 'accent-romance'; }
+  if (g.indexOf('animación') !== -1 || g.indexOf('anime') !== -1) { return 'accent-anime'; }
+  if (g.indexOf('drama') !== -1) { return 'accent-drama'; }
+  return 'accent-default';
+}
+
+/* ============================================================
+   CURIOUS FACTS via Claude API
+   ============================================================ */
+
+function loadCuriousFact(movieId, title, year, dir, targetDivId) {
+  var btn = document.getElementById('curious-btn-' + movieId);
+  var factDiv = document.getElementById('curious-div-' + movieId);
+
+  if (!btn || !factDiv) { return; }
+
+  /* Already loaded */
+  if (factDiv.dataset && factDiv.dataset.loaded === 'true') {
+    factDiv.style.display = factDiv.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+
+  btn.className = 'curious-btn loading-fact';
+  btn.innerHTML = '⏳ Buscando dato curioso...';
+
+  var prompt = 'Dame UN solo dato curioso, desconocido o sorprendente sobre la película "' + title + '" (' + year + ') dirigida por ' + dir + '. Máximo 2 oraciones. Solo el dato, sin introducción, sin comillas al inicio.';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var factDivNow = document.getElementById('curious-div-' + movieId);
+    var btnNow = document.getElementById('curious-btn-' + movieId);
+    if (!factDivNow) { return; }
+
+    if (xhr.status === 200) {
+      try {
+        var resp = JSON.parse(xhr.responseText);
+        var text = '';
+        if (resp.content && resp.content.length > 0) {
+          for (var i = 0; i < resp.content.length; i++) {
+            if (resp.content[i].type === 'text') { text = resp.content[i].text; break; }
+          }
+        }
+        if (text) {
+          factDivNow.innerHTML = '<div class="curious-fact-label">✦ dato curioso</div>' + escapeHtml(text);
+          factDivNow.style.display = 'block';
+          factDivNow.dataset = factDivNow.dataset || {};
+          factDivNow.dataset.loaded = 'true';
+          if (btnNow) { btnNow.style.display = 'none'; }
+        } else {
+          throw new Error('empty');
+        }
+      } catch(e) {
+        factDivNow.innerHTML = '<div class="curious-fact-label">✦ dato curioso</div>No se pudo cargar el dato. Intenta de nuevo.';
+        factDivNow.style.display = 'block';
+        if (btnNow) {
+          btnNow.className = 'curious-btn';
+          btnNow.innerHTML = '✦ Dato curioso';
+        }
+      }
+    } else {
+      if (btnNow) {
+        btnNow.className = 'curious-btn';
+        btnNow.innerHTML = '✦ Dato curioso';
+      }
+    }
+  };
+
+  var body = JSON.stringify({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    messages: [{role: 'user', content: prompt}]
+  });
+  xhr.send(body);
+}
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
 
 function saveAll() {
   if (!lsAvailable) { return; }
   try {
-    var data = JSON.stringify({watched: watched, ratings: ratings, notes: notes});
-    localStorage.setItem(LS_KEY, data);
-  } catch(e) {
-    console.error('Error guardando en localStorage:', e);
-  }
+    localStorage.setItem(LS_KEY, JSON.stringify({watched: watched, ratings: ratings, notes: notes}));
+  } catch(e) { console.error('Save error:', e); }
 }
 
 function loadAll() {
@@ -923,71 +1117,51 @@ function loadAll() {
     if (data.watched) { watched = data.watched; }
     if (data.ratings) { ratings = data.ratings; }
     if (data.notes) { notes = data.notes; }
-  } catch(e) {
-    console.error('Error cargando desde localStorage:', e);
-  }
+  } catch(e) { console.error('Load error:', e); }
 }
 
 /* ============================================================
-   FUNCIONES DE PROGRESO
+   PROGRESS
    ============================================================ */
 
 function updateProgress() {
   var allMovies = top100.concat(list500);
   var total = allMovies.length;
   var seen = 0;
-  for (var i = 0; i < allMovies.length; i++) {
+  var i;
+  for (i = 0; i < allMovies.length; i++) {
     if (watched[allMovies[i].id] === true) { seen++; }
   }
-
   var currentList = getCurrentList();
-  var tabTotal = currentList.length;
   var tabSeen = 0;
-  for (var j = 0; j < currentList.length; j++) {
-    if (watched[currentList[j].id] === true) { tabSeen++; }
+  for (i = 0; i < currentList.length; i++) {
+    if (watched[currentList[i].id] === true) { tabSeen++; }
   }
-
   var pct = total > 0 ? Math.round((seen / total) * 100) : 0;
-  document.getElementById('prog-label').textContent = tabSeen + ' / ' + tabTotal + ' vistas en esta lista (' + seen + ' / ' + total + ' total)';
+  document.getElementById('prog-label').textContent = tabSeen + ' / ' + currentList.length + ' en esta lista · ' + seen + ' / ' + total + ' total';
   document.getElementById('prog-pct').textContent = pct + '%';
   document.getElementById('prog-fill').style.width = pct + '%';
 }
 
 /* ============================================================
-   ACCIÓN: TOGGLE VISTA
+   ACTIONS
    ============================================================ */
 
 function toggleWatched(id) {
-  if (watched[id]) {
-    watched[id] = false;
-  } else {
-    watched[id] = true;
-  }
+  watched[id] = !watched[id];
   saveAll();
   updateProgress();
-  /* Update card appearance without full re-render */
   var card = document.getElementById('card-' + id);
   if (card) {
-    if (watched[id]) {
-      card.classList.add('watched');
-    } else {
-      card.classList.remove('watched');
-    }
+    if (watched[id]) { card.classList.add('watched'); } else { card.classList.remove('watched'); }
   }
 }
-
-/* ============================================================
-   ACCIÓN: RATING
-   ============================================================ */
 
 function setRating(id, val) {
   ratings[id] = val;
   saveAll();
-  /* Refresh stars for this movie */
   var starsDiv = document.getElementById('stars-' + id);
-  if (starsDiv) {
-    starsDiv.innerHTML = buildStarsHTML(id);
-  }
+  if (starsDiv) { starsDiv.innerHTML = buildStarsHTML(id); }
 }
 
 function buildStarsHTML(id) {
@@ -995,14 +1169,10 @@ function buildStarsHTML(id) {
   var html = '';
   for (var i = 1; i <= 5; i++) {
     var cls = i <= r ? 'star on' : 'star';
-    html += '<span class="' + cls + '" onclick="setRating(\'' + id + '\',' + i + ')" title="' + i + ' estrella' + (i > 1 ? 's' : '') + '">★</span>';
+    html += '<span class="' + cls + '" onclick="setRating(\'' + id + '\',' + i + ')">★</span>';
   }
   return html;
 }
-
-/* ============================================================
-   ACCIÓN: NOTAS
-   ============================================================ */
 
 function saveNote(id, val) {
   notes[id] = val;
@@ -1010,8 +1180,12 @@ function saveNote(id, val) {
 }
 
 /* ============================================================
-   FILTROS
+   FILTERS
    ============================================================ */
+
+function getCurrentList() {
+  return currentTab === 100 ? top100 : list500;
+}
 
 function getFilterValues() {
   return {
@@ -1027,208 +1201,233 @@ function getDecade(year) {
   return Math.floor(year / 10) * 10;
 }
 
+function matchesFilters(m, f) {
+  if (f.text) {
+    var s = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
+    if (s.indexOf(f.text) === -1) { return false; }
+  }
+  if (f.country && m.country.indexOf(f.country) === -1) { return false; }
+  if (f.decade && getDecade(m.year) !== parseInt(f.decade)) { return false; }
+  if (f.genre && m.genre.indexOf(f.genre) === -1) { return false; }
+  if (f.status === 'seen' && watched[m.id] !== true) { return false; }
+  if (f.status === 'unseen' && watched[m.id] === true) { return false; }
+  return true;
+}
+
 function applyFilters() {
   var f = getFilterValues();
   var list = getCurrentList();
   var filtered = [];
-
   for (var i = 0; i < list.length; i++) {
-    var m = list[i];
-    /* TEXT FILTER */
-    if (f.text) {
-      var searchStr = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
-      if (searchStr.indexOf(f.text) === -1) { continue; }
-    }
-    /* COUNTRY FILTER */
-    if (f.country && m.country.indexOf(f.country) === -1) { continue; }
-    /* DECADE FILTER */
-    if (f.decade && getDecade(m.year) !== parseInt(f.decade)) { continue; }
-    /* GENRE FILTER */
-    if (f.genre && m.genre.indexOf(f.genre) === -1) { continue; }
-    /* STATUS FILTER — lee del objeto watched en memoria */
-    if (f.status === 'seen' && watched[m.id] !== true) { continue; }
-    if (f.status === 'unseen' && watched[m.id] === true) { continue; }
-
-    filtered.push(m);
+    if (matchesFilters(list[i], f)) { filtered.push(list[i]); }
   }
-
   renderList(filtered);
-  document.getElementById('count-info').textContent = 'Mostrando ' + filtered.length + ' de ' + list.length + ' películas';
+  document.getElementById('count-info').textContent = filtered.length + ' de ' + list.length + ' películas';
 }
 
 function setStatusFilter(val) {
   statusFilter = val;
-  document.getElementById('btn-all').classList.remove('active');
-  document.getElementById('btn-seen').classList.remove('active');
-  document.getElementById('btn-unseen').classList.remove('active');
-  document.getElementById('btn-' + (val === 'all' ? 'all' : val === 'seen' ? 'seen' : 'unseen')).classList.add('active');
+  var map = {all: 'btn-all', seen: 'btn-seen', unseen: 'btn-unseen'};
+  var keys = ['all', 'seen', 'unseen'];
+  for (var i = 0; i < keys.length; i++) {
+    var btn = document.getElementById(map[keys[i]]);
+    if (btn) {
+      if (keys[i] === val) { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+    }
+  }
   applyFilters();
+}
+
+function buildFilterOptions() {
+  var list = getCurrentList();
+  var countries = {}, decades = {}, genres = {};
+  var i, j, parts, p;
+  for (i = 0; i < list.length; i++) {
+    var m = list[i];
+    parts = m.country.split(' / ');
+    for (j = 0; j < parts.length; j++) { p = parts[j].trim(); if (p) { countries[p] = true; } }
+    decades[getDecade(m.year)] = true;
+    parts = m.genre.split(' / ');
+    for (j = 0; j < parts.length; j++) { p = parts[j].trim(); if (p) { genres[p] = true; } }
+  }
+  var ch = '<option value="">Todos los países</option>';
+  var ca = Object.keys(countries).sort();
+  for (i = 0; i < ca.length; i++) { ch += '<option value="' + ca[i] + '">' + ca[i] + '</option>'; }
+  document.getElementById('filter-country').innerHTML = ch;
+
+  var dh = '<option value="">Todas las décadas</option>';
+  var da = Object.keys(decades).sort();
+  for (i = 0; i < da.length; i++) { dh += '<option value="' + da[i] + '">' + da[i] + 's</option>'; }
+  document.getElementById('filter-decade').innerHTML = dh;
+
+  var gh = '<option value="">Todos los géneros</option>';
+  var ga = Object.keys(genres).sort();
+  for (i = 0; i < ga.length; i++) { gh += '<option value="' + ga[i] + '">' + ga[i] + '</option>'; }
+  document.getElementById('filter-genre').innerHTML = gh;
 }
 
 /* ============================================================
    RENDER
    ============================================================ */
 
+/* Intersection Observer for lazy poster loading */
+var posterObserver = null;
+
+function setupObserver() {
+  if (!window.IntersectionObserver) { return; }
+  if (posterObserver) { posterObserver.disconnect(); }
+  posterObserver = new IntersectionObserver(function(entries) {
+    for (var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      if (entry.isIntersecting) {
+        var el = entry.target;
+        var mid = el.getAttribute('data-movie-id');
+        var title = el.getAttribute('data-title');
+        var year = el.getAttribute('data-year');
+        var imgEl = document.getElementById('poster-img-' + mid);
+        var phEl = document.getElementById('poster-ph-' + mid);
+        if (imgEl && !imgEl.src) {
+          fetchPoster(mid, title, year, imgEl, phEl);
+        }
+        posterObserver.unobserve(el);
+      }
+    }
+  }, {rootMargin: '200px'});
+}
+
 function renderList(movies) {
+  setupObserver();
   var container = document.getElementById('movie-list');
   var html = '';
+  var i, m, isWatched, note, accentClass, cbChecked, cardClass;
 
-  for (var i = 0; i < movies.length; i++) {
-    var m = movies[i];
-    var isWatched = watched[m.id] === true;
-    var note = notes[m.id] || '';
-    var starsHtml = buildStarsHTML(m.id);
-    var cbChecked = isWatched ? 'checked' : '';
-    var cardClass = isWatched ? 'movie-card watched' : 'movie-card';
+  for (i = 0; i < movies.length; i++) {
+    m = movies[i];
+    isWatched = watched[m.id] === true;
+    note = notes[m.id] || '';
+    accentClass = getAccentClass(m.genre);
+    cbChecked = isWatched ? 'checked' : '';
+    cardClass = isWatched ? 'movie-card watched' : 'movie-card';
 
     html += '<div class="' + cardClass + '" id="card-' + m.id + '">';
-    /* CHECKBOX */
-    html += '<div class="cb-wrap">';
+
+    /* POSTER */
+    html += '<div class="poster-wrap" data-movie-id="' + m.id + '" data-title="' + escapeAttr(m.title) + '" data-year="' + m.year + '">';
+    html += '<div class="poster-loading" id="poster-load-' + m.id + '"><div class="spinner"></div></div>';
+    html += '<img id="poster-img-' + m.id + '" style="display:none" alt="' + escapeAttr(m.title) + '" onerror="handleImgError(\'' + m.id + '\',\'' + escapeAttr(m.title) + '\',' + m.year + ')">';
+    html += '<div id="poster-ph-' + m.id + '" class="poster-placeholder" style="display:none"></div>';
+    html += '<div class="watched-overlay"><span class="watched-check">✓</span></div>';
+    html += '</div>';
+
+    /* ACCENT BAR */
+    html += '<div class="accent-bar ' + accentClass + '"></div>';
+
+    /* CARD BODY */
+    html += '<div class="card-body">';
+    html += '<div class="card-title">' + escapeHtml(m.title) + '</div>';
+    html += '<div class="card-dir">' + escapeHtml(m.dir) + '</div>';
+    html += '<div class="card-tags">';
+    html += '<span class="tag tag-year">' + m.year + '</span>';
+    html += '<span class="tag tag-country">' + escapeHtml(m.country) + '</span>';
+    if (m.stream) { html += '<span class="tag tag-stream">' + escapeHtml(m.stream) + '</span>'; }
+    html += '</div>';
+    html += '<div class="card-stars" id="stars-' + m.id + '">' + buildStarsHTML(m.id) + '</div>';
+    html += '<div class="card-check-row">';
     html += '<input type="checkbox" class="cb" id="cb-' + m.id + '" ' + cbChecked + ' onchange="toggleWatched(\'' + m.id + '\')">';
+    html += '<label class="card-check-label" for="cb-' + m.id + '">Vista</label>';
     html += '</div>';
-    /* INFO */
-    html += '<div class="movie-info">';
-    html += '<label class="movie-title" for="cb-' + m.id + '">' + m.title + '</label>';
-    html += '<div class="movie-meta">';
-    html += '<span class="badge badge-year">' + m.year + '</span>';
-    html += '<span class="badge">' + m.dir + '</span>';
-    html += '<span class="badge badge-country">' + m.country + '</span>';
-    html += '<span class="badge badge-genre">' + m.genre + '</span>';
-    if (m.stream) {
-      html += '<span class="badge badge-stream">▶ ' + m.stream + '</span>';
-    }
-    html += '</div>';
-    html += '<div class="stars" id="stars-' + m.id + '">' + starsHtml + '</div>';
-    html += '<textarea class="note-input" id="note-' + m.id + '" placeholder="Notas, opinión..." onchange="saveNote(\'' + m.id + '\', this.value)">' + escapeHtml(note) + '</textarea>';
-    html += '</div>';
-    /* NUMBER */
-    html += '<div class="num-badge">' + (i + 1) + '</div>';
-    html += '</div>';
+    html += '<textarea class="card-note" placeholder="Notas..." onchange="saveNote(\'' + m.id + '\',this.value)">' + escapeHtml(note) + '</textarea>';
+
+    /* CURIOUS FACT BUTTON */
+    html += '<button class="curious-btn" id="curious-btn-' + m.id + '" onclick="loadCuriousFact(\'' + m.id + '\',\'' + escapeAttr(m.title) + '\',' + m.year + ',\'' + escapeAttr(m.dir) + '\',\'' + m.id + '\')">';
+    html += '✦ Dato curioso</button>';
+    html += '<div class="curious-fact" id="curious-div-' + m.id + '" style="display:none"></div>';
+
+    html += '</div>'; /* card-body */
+    html += '</div>'; /* movie-card */
   }
 
   if (movies.length === 0) {
-    html = '<div class="empty"><div class="empty-icon">🎬</div><p>No se encontraron películas con estos filtros.<br>Intenta cambiar la búsqueda.</p></div>';
+    html = '<div class="empty"><span class="empty-icon">🎬</span><p>No hay películas con estos filtros.</p></div>';
   }
 
   container.innerHTML = html;
+
+  /* Attach observer to poster-wrap elements */
+  if (posterObserver) {
+    var wraps = container.querySelectorAll('.poster-wrap[data-movie-id]');
+    for (var j = 0; j < wraps.length; j++) {
+      posterObserver.observe(wraps[j]);
+    }
+  } else {
+    /* Fallback: load all immediately */
+    var allWraps = container.querySelectorAll('.poster-wrap[data-movie-id]');
+    for (var k = 0; k < allWraps.length; k++) {
+      var w = allWraps[k];
+      var mid2 = w.getAttribute('data-movie-id');
+      var t2 = w.getAttribute('data-title');
+      var y2 = w.getAttribute('data-year');
+      fetchPoster(mid2, t2, y2, document.getElementById('poster-img-' + mid2), document.getElementById('poster-ph-' + mid2));
+    }
+  }
+}
+
+function handleImgError(movieId, title, year) {
+  posterCache[movieId] = 'none';
+  var img = document.getElementById('poster-img-' + movieId);
+  if (img) { img.style.display = 'none'; }
+  var ph = document.getElementById('poster-ph-' + movieId);
+  if (ph) { showPlaceholder(ph, title, year); }
 }
 
 function escapeHtml(str) {
   if (!str) { return ''; }
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeAttr(str) {
+  if (!str) { return ''; }
+  return str.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
 }
 
 /* ============================================================
-   FILTROS DINÁMICOS (opciones de select)
-   ============================================================ */
-
-function buildFilterOptions() {
-  var list = getCurrentList();
-  var countries = {};
-  var decades = {};
-  var genres = {};
-
-  for (var i = 0; i < list.length; i++) {
-    var m = list[i];
-    /* Países — algunos tienen / entre varios */
-    var cParts = m.country.split(' / ');
-    for (var c = 0; c < cParts.length; c++) {
-      var cp = cParts[c].trim();
-      if (cp) { countries[cp] = true; }
-    }
-    /* Décadas */
-    var d = getDecade(m.year);
-    decades[d] = true;
-    /* Géneros — separados por / */
-    var gParts = m.genre.split(' / ');
-    for (var g = 0; g < gParts.length; g++) {
-      var gp = gParts[g].trim();
-      if (gp) { genres[gp] = true; }
-    }
-  }
-
-  /* Build country select */
-  var countryHtml = '<option value="">Todos los países</option>';
-  var countryArr = Object.keys(countries).sort();
-  for (var i2 = 0; i2 < countryArr.length; i2++) {
-    countryHtml += '<option value="' + countryArr[i2] + '">' + countryArr[i2] + '</option>';
-  }
-  document.getElementById('filter-country').innerHTML = countryHtml;
-
-  /* Build decade select */
-  var decadeHtml = '<option value="">Todas las décadas</option>';
-  var decadeArr = Object.keys(decades).sort();
-  for (var i3 = 0; i3 < decadeArr.length; i3++) {
-    var da = decadeArr[i3];
-    decadeHtml += '<option value="' + da + '">' + da + 's</option>';
-  }
-  document.getElementById('filter-decade').innerHTML = decadeHtml;
-
-  /* Build genre select */
-  var genreHtml = '<option value="">Todos los géneros</option>';
-  var genreArr = Object.keys(genres).sort();
-  for (var i4 = 0; i4 < genreArr.length; i4++) {
-    genreHtml += '<option value="' + genreArr[i4] + '">' + genreArr[i4] + '</option>';
-  }
-  document.getElementById('filter-genre').innerHTML = genreHtml;
-}
-
-/* ============================================================
-   CAMBIO DE TAB
+   SWITCH TAB
    ============================================================ */
 
 function switchTab(tabNum) {
   currentTab = tabNum;
-  /* Reset filters */
   document.getElementById('search-input').value = '';
   document.getElementById('filter-country').value = '';
   document.getElementById('filter-decade').value = '';
   document.getElementById('filter-genre').value = '';
   statusFilter = 'all';
-  document.getElementById('btn-all').classList.add('active');
-  document.getElementById('btn-seen').classList.remove('active');
-  document.getElementById('btn-unseen').classList.remove('active');
-
-  /* Update tab buttons */
+  setStatusFilter('all');
   var tabBtns = document.querySelectorAll('.tab-btn');
-  for (var i = 0; i < tabBtns.length; i++) {
-    tabBtns[i].classList.remove('active');
-  }
+  for (var i = 0; i < tabBtns.length; i++) { tabBtns[i].classList.remove('active'); }
   tabBtns[tabNum === 100 ? 0 : 1].classList.add('active');
-
   buildFilterOptions();
   applyFilters();
   updateProgress();
 }
 
 /* ============================================================
-   RANDOM MOVIE
+   RANDOM
    ============================================================ */
-
-var lastRandomPool = [];
 
 function getFilteredUnwatched() {
   var f = getFilterValues();
   var list = getCurrentList();
   var pool = [];
-
   for (var i = 0; i < list.length; i++) {
     var m = list[i];
-    /* Solo no vistas */
     if (watched[m.id] === true) { continue; }
-    /* Respeta filtros activos */
     if (f.text) {
-      var searchStr = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
-      if (searchStr.indexOf(f.text) === -1) { continue; }
+      var s = (m.title + ' ' + m.dir + ' ' + m.country + ' ' + m.genre).toLowerCase();
+      if (s.indexOf(f.text) === -1) { continue; }
     }
     if (f.country && m.country.indexOf(f.country) === -1) { continue; }
     if (f.decade && getDecade(m.year) !== parseInt(f.decade)) { continue; }
     if (f.genre && m.genre.indexOf(f.genre) === -1) { continue; }
-    /* Ignora filtro de status — random siempre busca no vistas */
     pool.push(m);
   }
   return pool;
@@ -1237,56 +1436,157 @@ function getFilteredUnwatched() {
 function pickRandom() {
   var pool = getFilteredUnwatched();
   var resultDiv = document.getElementById('random-result');
+  document.getElementById('random-modal').classList.add('open');
 
   if (pool.length === 0) {
-    resultDiv.innerHTML = '<div class="no-random">🎉 ¡Ya viste todo lo que coincide con los filtros actuales!<br><span style="font-size:0.8rem;color:var(--gray2)">Prueba quitando algún filtro.</span></div>';
-    document.getElementById('random-modal').classList.add('open');
+    resultDiv.innerHTML = '<div class="no-random">🎉 Ya viste todo con estos filtros.<br><small style="color:var(--gray2)">Prueba quitando algún filtro.</small></div>';
     return;
   }
 
-  /* Evitar repetir la misma hasta agotar el pool */
   if (lastRandomPool.length === 0 || lastRandomPool.length !== pool.length) {
     lastRandomPool = pool.slice();
   }
 
   var idx = Math.floor(Math.random() * lastRandomPool.length);
   var m = lastRandomPool[idx];
-  /* Quitar del pool temporal para no repetir hasta agotar */
   lastRandomPool.splice(idx, 1);
 
+  var accentClass = getAccentClass(m.genre);
   var cbChecked = watched[m.id] ? 'checked' : '';
   var starsHtml = buildStarsHTML(m.id);
 
-  resultDiv.innerHTML = '<div class="random-card">'
-    + '<div class="random-title">' + m.title + '</div>'
-    + '<div class="random-meta">'
-    + '<span class="badge badge-year">' + m.year + '</span>'
-    + '<span class="badge">' + m.dir + '</span>'
-    + '<span class="badge badge-country">' + m.country + '</span>'
-    + '<span class="badge badge-genre">' + m.genre + '</span>'
-    + '<span class="badge badge-stream">▶ ' + m.stream + '</span>'
+  resultDiv.innerHTML = '<div style="margin:16px 0">'
+    + '<div class="accent-bar ' + accentClass + '" style="border-radius:4px;margin-bottom:16px"></div>'
+    + '<div class="random-movie-display">'
+    + '<div class="random-poster">'
+    + '<div class="poster-loading" id="r-spin-' + m.id + '"><div class="spinner"></div></div>'
+    + '<img id="r-img-' + m.id + '" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:10px" alt="' + escapeAttr(m.title) + '">'
+    + '<div id="r-ph-' + m.id + '" class="random-poster-placeholder" style="display:none">' + m.year + '</div>'
     + '</div>'
-    + '<div class="stars" id="random-stars-' + m.id + '">' + starsHtml + '</div>'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-top:10px">'
-    + '<input type="checkbox" class="cb" id="random-cb-' + m.id + '" ' + cbChecked + ' onchange="toggleWatchedRandom(\'' + m.id + '\')">'
-    + '<label for="random-cb-' + m.id + '" style="font-size:0.85rem;color:var(--gray);cursor:pointer">Marcar como vista</label>'
+    + '<div class="random-info">'
+    + '<div class="random-title">' + escapeHtml(m.title) + '</div>'
+    + '<div class="random-dir">' + escapeHtml(m.dir) + ' · ' + m.year + '</div>'
+    + '<div class="random-tags">'
+    + '<span class="tag tag-country">' + escapeHtml(m.country) + '</span>'
+    + '<span class="tag tag-stream">' + escapeHtml(m.stream) + '</span>'
     + '</div>'
-    + '<div class="random-actions">'
+    + '<div id="random-stars-' + m.id + '" style="display:flex;gap:3px;margin-bottom:10px">' + starsHtml + '</div>'
+    + '<div class="random-check-row">'
+    + '<input type="checkbox" class="cb" id="r-cb-' + m.id + '" ' + cbChecked + ' onchange="toggleWatchedRandom(\'' + m.id + '\')">'
+    + '<label for="r-cb-' + m.id + '" style="font-size:0.78rem;color:var(--gray);cursor:pointer">Marcar como vista</label>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="random-fact" id="r-fact-' + m.id + '">'
+    + '<div class="random-fact-label">✦ dato curioso</div>'
+    + '<div class="random-fact-loading" id="r-fact-text-' + m.id + '">Cargando dato curioso...</div>'
+    + '</div>'
+    + '<div class="random-btns">'
     + '<button class="btn-reroll" onclick="pickRandom()">🎲 Otra película</button>'
     + '</div>'
-    + '<div style="font-size:0.72rem;color:var(--gray2);margin-top:10px">' + (lastRandomPool.length) + ' películas más sin ver con estos filtros</div>'
+    + '<div class="random-remaining">' + lastRandomPool.length + ' películas más sin ver con estos filtros</div>'
     + '</div>';
 
-  document.getElementById('random-modal').classList.add('open');
+  /* Load poster for random */
+  var rImg = document.getElementById('r-img-' + m.id);
+  var rPh = document.getElementById('r-ph-' + m.id);
+  var rSpin = document.getElementById('r-spin-' + m.id);
+  if (rImg) {
+    fetchPosterForRandom(m.id, m.title, m.year, rImg, rPh, rSpin);
+  }
+
+  /* Load curious fact automatically in random */
+  fetchRandomFact(m.id, m.title, m.year, m.dir);
+}
+
+function fetchPosterForRandom(movieId, title, year, imgEl, phEl, spinEl) {
+  if (posterCache[movieId] && posterCache[movieId] !== 'none') {
+    if (spinEl) { spinEl.style.display = 'none'; }
+    imgEl.src = posterCache[movieId];
+    imgEl.style.display = 'block';
+    if (phEl) { phEl.style.display = 'none'; }
+    return;
+  }
+  if (posterCache[movieId] === 'none') {
+    if (spinEl) { spinEl.style.display = 'none'; }
+    if (phEl) { phEl.style.display = 'block'; }
+    return;
+  }
+  var query = encodeURIComponent(title);
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB_KEY + '&query=' + query + '&year=' + year + '&language=en-US';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    if (spinEl) { spinEl.style.display = 'none'; }
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.results && data.results.length > 0 && data.results[0].poster_path) {
+          var posterUrl = 'https://image.tmdb.org/t/p/w300' + data.results[0].poster_path;
+          posterCache[movieId] = posterUrl;
+          imgEl.src = posterUrl;
+          imgEl.style.display = 'block';
+          if (phEl) { phEl.style.display = 'none'; }
+        } else {
+          posterCache[movieId] = 'none';
+          if (phEl) { phEl.style.display = 'block'; }
+        }
+      } catch(e) {
+        if (phEl) { phEl.style.display = 'block'; }
+      }
+    } else {
+      if (phEl) { phEl.style.display = 'block'; }
+    }
+  };
+  xhr.send();
+}
+
+function fetchRandomFact(movieId, title, year, dir) {
+  var factTextEl = document.getElementById('r-fact-text-' + movieId);
+  if (!factTextEl) { return; }
+
+  var prompt = 'Dame UN solo dato curioso, inesperado o poco conocido sobre la película "' + title + '" (' + year + ') de ' + dir + '. Máximo 2 oraciones directas. Sin introducción.';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var el = document.getElementById('r-fact-text-' + movieId);
+    if (!el) { return; }
+    if (xhr.status === 200) {
+      try {
+        var resp = JSON.parse(xhr.responseText);
+        var text = '';
+        if (resp.content && resp.content.length > 0) {
+          for (var i = 0; i < resp.content.length; i++) {
+            if (resp.content[i].type === 'text') { text = resp.content[i].text; break; }
+          }
+        }
+        el.textContent = text || 'Sin dato disponible.';
+        el.className = '';
+      } catch(e) {
+        el.textContent = 'Sin dato disponible.';
+        el.className = '';
+      }
+    } else {
+      el.textContent = 'No se pudo cargar el dato.';
+      el.className = '';
+    }
+  };
+  var body = JSON.stringify({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    messages: [{role: 'user', content: prompt}]
+  });
+  xhr.send(body);
 }
 
 function toggleWatchedRandom(id) {
   toggleWatched(id);
-  /* Refresh stars in random modal too */
-  var randomStars = document.getElementById('random-stars-' + id);
-  if (randomStars) {
-    randomStars.innerHTML = buildStarsHTML(id);
-  }
+  var rStars = document.getElementById('random-stars-' + id);
+  if (rStars) { rStars.innerHTML = buildStarsHTML(id); }
 }
 
 function closeRandomModal() {
@@ -1295,7 +1595,7 @@ function closeRandomModal() {
 }
 
 /* ============================================================
-   EXPORTAR / IMPORTAR
+   EXPORT / IMPORT / RESET
    ============================================================ */
 
 function exportProgress() {
@@ -1311,21 +1611,12 @@ function exportProgress() {
   URL.revokeObjectURL(url);
 }
 
-function openImportModal() {
-  document.getElementById('import-modal').classList.add('open');
-}
-
-function closeImportModal() {
-  document.getElementById('import-modal').classList.remove('open');
-  document.getElementById('import-text').value = '';
-}
+function openImportModal() { document.getElementById('import-modal').classList.add('open'); }
+function closeImportModal() { document.getElementById('import-modal').classList.remove('open'); document.getElementById('import-text').value = ''; }
 
 function doImport() {
   var txt = document.getElementById('import-text').value.trim();
-  if (!txt) {
-    alert('Pega el JSON primero.');
-    return;
-  }
+  if (!txt) { alert('Pega el JSON primero.'); return; }
   try {
     var data = JSON.parse(txt);
     if (data.watched) { watched = data.watched; }
@@ -1335,48 +1626,30 @@ function doImport() {
     closeImportModal();
     applyFilters();
     updateProgress();
-    alert('¡Progreso importado correctamente!');
-  } catch(e) {
-    alert('Error al parsear el JSON. Asegúrate de que sea válido.');
-  }
+    alert('¡Progreso importado!');
+  } catch(e) { alert('JSON inválido.'); }
 }
 
-/* ============================================================
-   RESET
-   ============================================================ */
-
 function clearAllProgress() {
-  if (!confirm('¿Segura? Esto borrará todo tu progreso (vistas, ratings y notas).')) { return; }
-  watched = {};
-  ratings = {};
-  notes = {};
+  if (!confirm('¿Borrar todo el progreso?')) { return; }
+  watched = {}; ratings = {}; notes = {};
   saveAll();
   applyFilters();
   updateProgress();
 }
 
 /* ============================================================
-   INIT — ejecuta antes de renderizar
+   INIT
    ============================================================ */
 
-/* 1. Cargar estado ANTES de renderizar */
 loadAll();
-
-/* 2. Construir filtros para la tab actual */
 buildFilterOptions();
-
-/* 3. Renderizar lista con estado ya cargado */
 applyFilters();
-
-/* 4. Actualizar progreso */
 updateProgress();
 
-/* Cerrar modales con Escape */
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeImportModal(); closeRandomModal(); }
 });
-
-/* Cerrar modal al hacer click fuera */
 document.getElementById('import-modal').addEventListener('click', function(e) {
   if (e.target === this) { closeImportModal(); }
 });
