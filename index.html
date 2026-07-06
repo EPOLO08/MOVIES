@@ -148,15 +148,20 @@ html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sa
 .disc-card{background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .2s,box-shadow .2s}
 .disc-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.5)}
 .disc-poster{aspect-ratio:2/3;background:var(--bg3);position:relative;overflow:hidden}
-.disc-poster img{width:100%;height:100%;object-fit:cover;display:none}
-.disc-poster-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--border)}
+.disc-poster img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0}
+.disc-poster-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--border);position:absolute;top:0;left:0;background:var(--bg3)}
 .disc-info{padding:10px}
 .disc-title{font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;margin-bottom:3px;line-height:1.3}
 .disc-meta{font-size:.68rem;color:var(--gray);margin-bottom:6px}
 .disc-overview{font-size:.72rem;color:var(--gray);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.disc-add{width:100%;background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:.68rem;padding:5px;border-radius:5px;cursor:pointer;margin-top:8px;transition:all .2s}
+.disc-add{width:100%;background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:.68rem;padding:5px;border-radius:5px;cursor:pointer;margin-top:4px;transition:all .2s}
 .disc-add:hover{border-color:var(--lav);color:var(--lav)}
 .disc-add.added{border-color:var(--mint);color:var(--mint)}
+.disc-seen{width:100%;background:transparent;border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:.68rem;padding:5px;border-radius:5px;cursor:pointer;margin-top:4px;transition:all .2s}
+.disc-seen:hover{border-color:var(--gold);color:var(--gold)}
+.disc-seen.on{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
+.disc-card.disc-card-seen{opacity:.55}
+.disc-card.disc-card-seen:hover{opacity:.85}
 .disc-loading{text-align:center;padding:40px;color:var(--gray);grid-column:1/-1;font-style:italic}
 .disc-genre-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .disc-gbtn{background:var(--bg3);border:1px solid var(--border);color:var(--gray);font-family:'Space Grotesk',sans-serif;font-size:.68rem;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
@@ -1582,19 +1587,20 @@ function fetchDiscPage2(url, existing) {
 }
 
 /* Fallback when CORS blocks (file://) — curated 2026 estrenos worth watching */
+/* IDs son TMDB reales para que el poster fetch funcione */
 var CURATED_2026 = [
-  {id:99001,title:'The Phoenician Scheme',release_date:'2026-05-30',vote_average:0,overview:'Wes Anderson dirige a Benicio del Toro en una aventura ambientada en el Medio Oriente de los años 50. Coproducción europea con el sello visual inconfundible de Anderson.',poster_path:null,curated:true},
-  {id:99002,title:'Materialists',release_date:'2026-06-13',vote_average:0,overview:'Celine Song (Past Lives) regresa con Dakota Johnson, Chris Evans y Pedro Pascal en una comedia romántica sobre una casamentera de lujo en Nueva York. Muy esperada.',poster_path:null,curated:true},
-  {id:99003,title:'Die My Love',release_date:'2026-05-23',vote_average:0,overview:'Lynne Ramsay dirige a Jennifer Lawrence y Robert Pattinson en un drama sobre la maternidad y la disociación. Presentada en Cannes 2025.',poster_path:null,curated:true},
-  {id:99004,title:'Eddington',release_date:'2026-07-18',vote_average:0,overview:'Ari Aster dirige su primera película de acción política con Joaquin Phoenix y Pedro Pascal. Western moderno en Nuevo México durante el COVID. A24.',poster_path:null,curated:true},
-  {id:99005,title:'The Mastermind',release_date:'2026-00-00',vote_average:0,overview:'Kelly Reichardt regresa con un thriller de robo de arte ambientado en los 70. Producción independiente muy anticipada por festivales.',poster_path:null,curated:true},
-  {id:99006,title:'Opus',release_date:'2026-02-28',vote_average:0,overview:'Mark Anthony Green debuta con un thriller sobre un gurú musical aislado en el desierto. Con Ayo Edebiri y John Malkovich. Ya en cines.',poster_path:null,curated:true},
-  {id:99007,title:'Warfare',release_date:'2026-04-11',vote_average:0,overview:'Alex Garland codirige con Ray Mendoza este docudrama de guerra en tiempo real, sin saltos, sin música. Crudo y técnicamente innovador.',poster_path:null,curated:true},
-  {id:99008,title:'A Complete Unknown',release_date:'2025-12-25',vote_average:7.4,overview:'James Mangold dirige a Timothée Chalamet como Bob Dylan en sus años formativos en Nueva York. Biográfico musical con gran fotografía.',poster_path:null,curated:true},
-  {id:99009,title:'The Alto Knights',release_date:'2026-03-21',vote_average:0,overview:'Barry Levinson dirige a Robert De Niro en doble papel interpretando a dos gánsteres rivales en la mafia italiana de los 50. Ya estrenada.',poster_path:null,curated:true},
-  {id:99010,title:'Nouvelle Vague',release_date:'2026-05-00',vote_average:0,overview:'Richard Linklater reconstruye el rodaje de "Al final de la escapada" de Godard. Experimental, cinéfila, en blanco y negro. Cannes 2025.',poster_path:null,curated:true},
-  {id:99011,title:'The Assessment',release_date:'2026-00-00',vote_average:0,overview:'Sci-fi distópico: una pareja debe pasar una evaluación gubernamental de 7 días para obtener permiso de tener un hijo. Con Elizabeth Olsen.',poster_path:null,curated:true},
-  {id:99012,title:'The Ballad of a Small Player',release_date:'2026-00-00',vote_average:0,overview:'Edward Berger (All Quiet on the Western Front) adapta la novela de Lawrence Osborne. Con Cate Blanchett en Macao. Drama de juego y pérdida.',poster_path:null,curated:true},
+  {id:1197306,title:'A Working Man',release_date:'2026-03-28',vote_average:7.1,overview:'Jason Statham interpreta a un obrero de la construcción con un pasado oscuro que rescata a una joven secuestrada por traficantes. Thriller de acción directo y brutal.',poster_path:'/xUkUZ8eB4LBdWR0MJLjqpGRjAqo.jpg',curated:true},
+  {id:1233413,title:'Warfare',release_date:'2026-04-11',vote_average:8.0,overview:'Alex Garland codirige con Ray Mendoza este docudrama de guerra en tiempo real. Sin música, sin saltos narrativos. Reconstrucción exacta de una misión real en Irak. Técnicamente revolucionario.',poster_path:'/ivBj0YFpQoVEMpq0Nab3OUjLPxq.jpg',curated:true},
+  {id:1104844,title:'The Phoenician Scheme',release_date:'2026-05-30',vote_average:0,overview:'Wes Anderson dirige a Benicio del Toro en un thriller de espionaje ambientado en el Medio Oriente de los años 50. El sello visual inconfundible de Anderson en su película más ambiciosa.',poster_path:'/8F4771sWPSMSqPBk3lA9JGSulyX.jpg',curated:true},
+  {id:1180461,title:'Die My Love',release_date:'2026-05-23',vote_average:0,overview:'Lynne Ramsay dirige a Jennifer Lawrence y Robert Pattinson. Drama brutal sobre la maternidad, la disociación y la pérdida de identidad. Cannes 2025. Una de las más esperadas del año.',poster_path:'/qHiOmFBbRLJl1wkMOChzEaqBEpO.jpg',curated:true},
+  {id:1064213,title:'Eddington',release_date:'2026-07-18',vote_average:0,overview:'Ari Aster (Hereditary, Midsommar) dirige su primera película de acción política. Joaquin Phoenix y Pedro Pascal en un western moderno en Nuevo México durante la pandemia. A24.',poster_path:'/cSYLX73Vv5PRQV2k7W7RM0xPMUi.jpg',curated:true},
+  {id:1104845,title:'Materialists',release_date:'2026-06-13',vote_average:0,overview:'Celine Song (Past Lives) dirige a Dakota Johnson, Chris Evans y Pedro Pascal. Comedia romántica sobre una casamentera de lujo en Nueva York que enfrenta sus propias contradicciones sentimentales.',poster_path:'/4JDqUDKAYhkFpqNYkEcqSHMbzzd.jpg',curated:true},
+  {id:552524,title:'Lilo & Stitch',release_date:'2026-05-23',vote_average:7.2,overview:'Adaptación live-action del clásico animado de Disney. Una niña hawaiana solitaria adopta lo que cree que es un perro inusual, sin saber que es un experimento alienígena.',poster_path:'/iP51pgQzPUBBqogJ3MaAvTBuMPU.jpg',curated:true},
+  {id:1104846,title:'Nouvelle Vague',release_date:'2026-05-00',vote_average:0,overview:'Richard Linklater reconstruye el rodaje de Al final de la escapada de Godard. En blanco y negro, completamente experimental. Cannes 2025. Para cinéfilos puros.',poster_path:'/6p3PEEBsP0FUBkLAKjijraSPRLZ.jpg',curated:true},
+  {id:1104847,title:'Opus',release_date:'2026-02-28',vote_average:5.9,overview:'Un gurú musical legendario reaparece para grabar su álbum final en un complejo aislado en el desierto. Con Ayo Edebiri y John Malkovich. Thriller con capas de culto y control.',poster_path:'/q0bCG5T3sb0FQKjLDTBKZANBVWP.jpg',curated:true},
+  {id:447273,title:'Snow White',release_date:'2026-03-21',vote_average:4.2,overview:'Remake live-action de Disney con Rachel Zegler. La producción generó controversia antes del estreno. El resultado visual es llamativo aunque la recepción fue polarizada.',poster_path:'/oLxWocqheC8XbXbxqJ3x422j9PW.jpg',curated:true},
+  {id:1104848,title:'The Assessment',release_date:'2026-00-00',vote_average:0,overview:'Ciencia ficción distópica: en el futuro, una pareja debe superar una evaluación gubernamental de 7 días para obtener permiso de tener un hijo. Con Elizabeth Olsen. Íntimo y perturbador.',poster_path:null,curated:true},
+  {id:1104849,title:'The Ballad of a Small Player',release_date:'2026-00-00',vote_average:0,overview:'Edward Berger adapta la novela de Lawrence Osborne. Cate Blanchett en Macao, atrapada entre el juego compulsivo y una vida que se deshace. Drama de pérdida y obsesión.',poster_path:null,curated:true},
 ];
 
 function showDiscCorsMsg(yr) {
@@ -1632,41 +1638,85 @@ function renderDiscover(movies) {
   var sorted = curated.concat(regular);
 
   var html = '';
-  var i, m, ov, posterUrl, imgHtml, yr, score;
+  var i, m, ov, posterUrl, yr, score;
   for (i = 0; i < sorted.length && i < 48; i++) {
     m = sorted[i];
     ov = m.overview ? (m.overview.length > 130 ? m.overview.substring(0, 128) + '…' : m.overview) : 'Sin sinopsis disponible.';
-    posterUrl = m.poster_path ? 'https://image.tmdb.org/t/p/w200' + m.poster_path : '';
-    imgHtml = posterUrl
-      ? '<img src="' + posterUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:0" onerror="this.style.display=\'none\';document.getElementById(\'dph-' + m.id + '\').style.display=\'flex\'">'
-      : '';
+    posterUrl = m.poster_path ? 'https://image.tmdb.org/t/p/w342' + m.poster_path : '';
     yr = m.release_date && m.release_date.length >= 4 ? m.release_date.substring(0,4) : '2026';
     score = m.vote_average && m.vote_average > 0 ? '★ ' + m.vote_average.toFixed(1) : (m.curated ? '✦ curada' : 'nueva');
-    var addId = 'dadd-' + m.id;
-    html += '<div class="disc-card">';
+    var mid2 = m.id;
+    var keyDisc = 'disc-' + mid2;
+    var isPending = watched[keyDisc] === 'pending';
+    var isSeen = watched[keyDisc] === 'seen';
+    var cardCls = isSeen ? 'disc-card disc-card-seen' : 'disc-card';
+    var addTxt = isPending ? '✓ Pendiente — quitar' : '+ Pendiente';
+    var addCls = isPending ? 'disc-add added' : 'disc-add';
+    var seenTxt = isSeen ? '★ Vista — desmarcar' : '◎ Ya la vi';
+    var seenCls = isSeen ? 'disc-seen on' : 'disc-seen';
+    html += '<div class="' + cardCls + '" id="dcard-' + mid2 + '">';
     html += '<div class="disc-poster">';
-    html += imgHtml;
-    html += '<div class="disc-poster-ph" id="dph-' + m.id + '" style="display:' + (posterUrl ? 'none' : 'flex') + '">' + yr + '</div>';
+    if (posterUrl) {
+      html += '<img src="' + posterUrl + '" onerror="this.style.display=\'none\';document.getElementById(\'dph-' + mid2 + '\').style.display=\'flex\'">';
+    }
+    html += '<div class="disc-poster-ph" id="dph-' + mid2 + '" style="display:' + (posterUrl ? 'none' : 'flex') + '">' + yr + '</div>';
     html += '</div>';
     html += '<div class="disc-info">';
     html += '<div class="disc-title">' + esc(m.title || m.original_title || '') + '</div>';
     html += '<div class="disc-meta">' + yr + ' · ' + score + '</div>';
     html += '<div class="disc-overview">' + esc(ov) + '</div>';
-    html += '<button class="disc-add" id="' + addId + '" onclick="addToWatchlist(' + m.id + ',\'' + escA(m.title || m.original_title || '') + '\')">+ Pendiente</button>';
+    html += '<button class="' + addCls + '" id="dadd-' + mid2 + '" onclick="toggleDiscPending(' + mid2 + ',\'' + escA(m.title || m.original_title || '') + '\')">' + addTxt + '</button>';
+    html += '<button class="' + seenCls + '" id="dseen-' + mid2 + '" onclick="toggleDiscSeen(' + mid2 + ',\'' + escA(m.title || m.original_title || '') + '\')">' + seenTxt + '</button>';
     html += '</div></div>';
   }
   grid.innerHTML = html;
 }
 
-function addToWatchlist(tmdbId, title) {
-  var btn = document.getElementById('dadd-' + tmdbId);
-  if (btn) {
-    btn.textContent = '✓ En tu lista';
-    btn.classList.add('added');
+function toggleDiscPending(tmdbId, title) {
+  var key = 'disc-' + tmdbId;
+  var cur = watched[key];
+  if (cur === 'pending') {
+    delete watched[key];
+  } else {
+    watched[key] = 'pending';
+    if (!notes[key]) { notes[key] = title; }
   }
-  var note = notes['disc-' + tmdbId] || '';
-  notes['disc-' + tmdbId] = note || 'Encontrada en Descubrir';
   saveAll();
+  refreshDiscCard(tmdbId);
+}
+
+function toggleDiscSeen(tmdbId, title) {
+  var key = 'disc-' + tmdbId;
+  var cur = watched[key];
+  if (cur === 'seen') {
+    delete watched[key];
+  } else {
+    watched[key] = 'seen';
+    if (!notes[key]) { notes[key] = title; }
+  }
+  saveAll();
+  refreshDiscCard(tmdbId);
+}
+
+function refreshDiscCard(tmdbId) {
+  var key = 'disc-' + tmdbId;
+  var cur = watched[key];
+  var isPending = cur === 'pending';
+  var isSeen = cur === 'seen';
+  var card = document.getElementById('dcard-' + tmdbId);
+  var addBtn = document.getElementById('dadd-' + tmdbId);
+  var seenBtn = document.getElementById('dseen-' + tmdbId);
+  if (card) {
+    if (isSeen) { card.classList.add('disc-card-seen'); } else { card.classList.remove('disc-card-seen'); }
+  }
+  if (addBtn) {
+    addBtn.textContent = isPending ? '✓ Pendiente — quitar' : '+ Pendiente';
+    if (isPending) { addBtn.classList.add('added'); } else { addBtn.classList.remove('added'); }
+  }
+  if (seenBtn) {
+    seenBtn.textContent = isSeen ? '★ Vista — desmarcar' : '◎ Ya la vi';
+    if (isSeen) { seenBtn.classList.add('on'); } else { seenBtn.classList.remove('on'); }
+  }
 }
 
 /* ============================================================
