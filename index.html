@@ -66,9 +66,10 @@ html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sa
 
 /* POSTER */
 .poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--bg3);cursor:pointer}
-.poster img{width:100%;height:100%;object-fit:cover;display:none;transition:transform .3s}
-.card:hover .poster img{transform:scale(1.04)}
-.poster-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center}
+.poster img{width:100%;height:100%;object-fit:cover;display:none;transition:transform .3s;position:absolute;top:0;left:0}
+.poster img.loaded{display:block}
+.card:hover .poster img.loaded{transform:scale(1.04)}
+.poster-ph{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;background:var(--bg3)}
 .poster-yr{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--border);letter-spacing:2px}
 .poster-ti{font-family:'Playfair Display',serif;font-size:.7rem;color:var(--gray2);line-height:1.3;font-style:italic}
 .spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
@@ -1044,13 +1045,25 @@ function updateProgress() {
   var all = top100.concat(list500);
   var total = all.length;
   var seen = 0;
-  var i;
+  var i, key;
   for (i = 0; i < all.length; i++) { if (watched[all[i].id] === true) { seen++; } }
+  /* Count disc seen */
+  var discSeen = 0;
+  var keys = Object.keys(watched);
+  for (i = 0; i < keys.length; i++) {
+    key = keys[i];
+    if (key.indexOf('disc-') === 0 && watched[key] === 'seen') { discSeen++; }
+  }
   var cur = getCurrent();
   var curSeen = 0;
   for (i = 0; i < cur.length; i++) { if (watched[cur[i].id] === true) { curSeen++; } }
   var pct = total > 0 ? Math.round((seen / total) * 100) : 0;
-  document.getElementById('prog-lbl').textContent = curSeen + ' / ' + cur.length + ' en esta lista · ' + seen + ' / ' + total + ' total';
+  var discTxt = discSeen > 0 ? ' · ' + discSeen + ' descubiertas vistas' : '';
+  if (curTab === 'disc') {
+    document.getElementById('prog-lbl').textContent = discSeen + ' películas de Descubrir vistas' + (discSeen === 0 ? ' — empieza a explorar' : '');
+  } else {
+    document.getElementById('prog-lbl').textContent = curSeen + ' / ' + cur.length + ' en esta lista · ' + seen + ' / ' + total + ' total' + discTxt;
+  }
   document.getElementById('prog-pct').textContent = pct + '%';
   document.getElementById('prog-fill').style.width = pct + '%';
 }
@@ -1246,12 +1259,24 @@ function loadPosterEn(mid, title, year, domSuffix) {
 function showImg(sfx, url) {
   var img = document.getElementById('img-' + sfx);
   var ph = document.getElementById('ph-' + sfx);
-  if (img) { img.src = url; img.style.display = 'block'; }
-  if (ph) { ph.style.display = 'none'; }
+  var sp = document.getElementById('sp-' + sfx);
+  if (sp) { sp.style.display = 'none'; }
+  if (!img) { return; }
+  img.src = url;
+  img.onload = function() {
+    img.classList.add('loaded');
+    if (ph) { ph.style.display = 'none'; }
+  };
+  img.onerror = function() {
+    img.style.display = 'none';
+    showPh(sfx, img.alt, '');
+  };
 }
 
 function showPh(sfx, title, year) {
   var ph = document.getElementById('ph-' + sfx);
+  var sp = document.getElementById('sp-' + sfx);
+  if (sp) { sp.style.display = 'none'; }
   if (ph) {
     ph.style.display = 'flex';
     ph.innerHTML = '<div class="poster-yr">' + year + '</div><div class="poster-ti">' + esc(title) + '</div>';
@@ -1408,7 +1433,7 @@ function renderList(movies) {
     /* POSTER */
     html += '<div class="poster" data-mid="' + m.id + '" data-title="' + escA(m.title) + '" data-year="' + m.year + '" onclick="toggleSyn(\'' + m.id + '\')">';
     html += '<div class="spin" id="sp-' + m.id + '"></div>';
-    html += '<img id="img-' + m.id + '" style="display:none" alt="' + escA(m.title) + '" onerror="posterErr(\'' + m.id + '\',\'' + escA(m.title) + '\',' + m.year + ')">';
+    html += '<img id="img-' + m.id + '" alt="' + escA(m.title) + '" onerror="posterErr(\'' + m.id + '\',\'' + escA(m.title) + '\',' + m.year + ')">';
     html += '<div id="ph-' + m.id + '" class="poster-ph" style="display:none"></div>';
     html += '<div class="wov"><span>✓</span></div>';
     html += '</div>';
@@ -1664,12 +1689,32 @@ function renderDiscover(movies) {
     html += '<div class="disc-info">';
     html += '<div class="disc-title">' + esc(m.title || m.original_title || '') + '</div>';
     html += '<div class="disc-meta">' + yr + ' · ' + score + '</div>';
-    html += '<div class="disc-overview">' + esc(ov) + '</div>';
-    html += '<button class="' + addCls + '" id="dadd-' + mid2 + '" onclick="toggleDiscPending(' + mid2 + ',\'' + escA(m.title || m.original_title || '') + '\')">' + addTxt + '</button>';
-    html += '<button class="' + seenCls + '" id="dseen-' + mid2 + '" onclick="toggleDiscSeen(' + mid2 + ',\'' + escA(m.title || m.original_title || '') + '\')">' + seenTxt + '</button>';
+    html += '<div class="disc-overview" id="dovw-' + mid2 + '">' + esc(ov) + '</div>';
+    html += '<button class="xbtn xbtn-syn" id="dsbtn-' + mid2 + '" style="margin-top:6px" data-action="disc-syn" data-id="' + mid2 + '" data-title="' + escA(m.title || m.original_title || '') + '" data-year="' + yr + '">◎ Sinopsis completa</button>';
+    html += '<div class="xpanel xpanel-syn" id="dsyn-' + mid2 + '"></div>';
+    html += '<button class="' + addCls + '" id="dadd-' + mid2 + '" data-action="disc-pending" data-id="' + mid2 + '" data-title="' + escA(m.title || m.original_title || '') + '">' + addTxt + '</button>';
+    html += '<button class="' + seenCls + '" id="dseen-' + mid2 + '" data-action="disc-seen" data-id="' + mid2 + '" data-title="' + escA(m.title || m.original_title || '') + '">' + seenTxt + '</button>';
     html += '</div></div>';
   }
   grid.innerHTML = html;
+  /* Attach delegated listener fresh each render */
+  var g = document.getElementById('disc-grid');
+  if (g._discListener) { g.removeEventListener('click', g._discListener); }
+  g._discListener = function(e) {
+    var btn = e.target;
+    if (!btn || !btn.getAttribute) { return; }
+    var action = btn.getAttribute('data-action');
+    if (!action) { return; }
+    var id = parseInt(btn.getAttribute('data-id'), 10);
+    var title = btn.getAttribute('data-title') || '';
+    if (action === 'disc-pending') { toggleDiscPending(id, title); }
+    else if (action === 'disc-seen') { toggleDiscSeen(id, title); }
+    else if (action === 'disc-syn') {
+      var yr2 = btn.getAttribute('data-year') || '2026';
+      toggleDiscSyn(id, title, yr2);
+    }
+  };
+  g.addEventListener('click', g._discListener);
 }
 
 function toggleDiscPending(tmdbId, title) {
@@ -1717,6 +1762,71 @@ function refreshDiscCard(tmdbId) {
     seenBtn.textContent = isSeen ? '★ Vista — desmarcar' : '◎ Ya la vi';
     if (isSeen) { seenBtn.classList.add('on'); } else { seenBtn.classList.remove('on'); }
   }
+  updateProgress();
+}
+
+function toggleDiscSyn(tmdbId, title, year) {
+  var panel = document.getElementById('dsyn-' + tmdbId);
+  var btn = document.getElementById('dsbtn-' + tmdbId);
+  if (!panel) { return; }
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    if (btn) { btn.innerHTML = '◎ Sinopsis completa'; }
+    return;
+  }
+  panel.classList.add('open');
+  if (panel.getAttribute('data-loaded') === '1') {
+    if (btn) { btn.innerHTML = '◎ Ocultar'; }
+    return;
+  }
+  panel.innerHTML = '<span class="xloading">Cargando...</span>';
+  if (btn) { btn.innerHTML = '◎ Cargando...'; }
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB + '&query=' + encodeURIComponent(title) + '&year=' + year + '&language=es-ES';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) { return; }
+    var p = document.getElementById('dsyn-' + tmdbId);
+    var b = document.getElementById('dsbtn-' + tmdbId);
+    if (!p) { return; }
+    if (xhr.status === 200) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if (d.results && d.results.length > 0 && d.results[0].overview) {
+          p.innerHTML = '<div class="xlbl xlbl-syn">sinopsis</div>' + esc(d.results[0].overview);
+          p.setAttribute('data-loaded', '1');
+          if (b) { b.innerHTML = '◎ Ocultar'; }
+          return;
+        }
+      } catch(e) {}
+    }
+    /* fallback English */
+    var url2 = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB + '&query=' + encodeURIComponent(title) + '&year=' + year + '&language=en-US';
+    var xhr2 = new XMLHttpRequest();
+    xhr2.open('GET', url2, true);
+    xhr2.onreadystatechange = function() {
+      if (xhr2.readyState !== 4) { return; }
+      var p2 = document.getElementById('dsyn-' + tmdbId);
+      var b2 = document.getElementById('dsbtn-' + tmdbId);
+      if (!p2) { return; }
+      if (xhr2.status === 200) {
+        try {
+          var d2 = JSON.parse(xhr2.responseText);
+          if (d2.results && d2.results.length > 0 && d2.results[0].overview) {
+            p2.innerHTML = '<div class="xlbl xlbl-syn">sinopsis (en)</div>' + esc(d2.results[0].overview);
+            p2.setAttribute('data-loaded', '1');
+            if (b2) { b2.innerHTML = '◎ Ocultar'; }
+            return;
+          }
+        } catch(e) {}
+      }
+      p2.innerHTML = '<div class="xlbl xlbl-syn">sinopsis</div>No disponible.';
+      p2.setAttribute('data-loaded', '1');
+      if (b2) { b2.innerHTML = '◎ Sinopsis completa'; }
+    };
+    xhr2.send();
+  };
+  xhr.send();
 }
 
 /* ============================================================
@@ -1760,7 +1870,7 @@ function pickRandom() {
     + '<div class="rdisp">'
     + '<div class="rposter" id="rp-wrap-' + m.id + '">'
     + '<div class="spin" id="rp-sp-' + m.id + '"></div>'
-    + '<img id="rp-img-' + m.id + '" style="display:none;width:100%;height:100%;object-fit:cover" alt="' + escA(m.title) + '">'
+    + '<img id="rp-img-' + m.id + '" style="width:100%;height:100%;object-fit:cover;display:none" alt="' + escA(m.title) + '">'
     + '<div id="rp-ph-' + m.id + '" class="rposter-ph" style="display:none">' + m.year + '</div>'
     + '</div>'
     + '<div class="random-info">'
@@ -1790,12 +1900,14 @@ function pickRandom() {
 
 function loadRandPoster(mid, title, year) {
   if (posterCache[mid] && posterCache[mid] !== 'none') {
-    var sp = document.getElementById('rp-sp-' + mid);
-    var img = document.getElementById('rp-img-' + mid);
-    var ph = document.getElementById('rp-ph-' + mid);
-    if (sp) { sp.style.display = 'none'; }
-    if (img) { img.src = posterCache[mid]; img.style.display = 'block'; }
-    if (ph) { ph.style.display = 'none'; }
+    var sp0 = document.getElementById('rp-sp-' + mid);
+    var img0 = document.getElementById('rp-img-' + mid);
+    var ph0 = document.getElementById('rp-ph-' + mid);
+    if (sp0) { sp0.style.display = 'none'; }
+    if (img0) {
+      img0.src = posterCache[mid];
+      img0.onload = function() { img0.style.display = 'block'; if (ph0) { ph0.style.display = 'none'; } };
+    }
     return;
   }
   var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB + '&query=' + encodeURIComponent(title) + '&year=' + year + '&language=es-ES';
@@ -1814,8 +1926,10 @@ function loadRandPoster(mid, title, year) {
           var pu = 'https://image.tmdb.org/t/p/w300' + d.results[0].poster_path;
           posterCache[mid] = pu;
           if (d.results[0].overview && !synCache[mid]) { synCache[mid] = d.results[0].overview; }
-          if (img) { img.src = pu; img.style.display = 'block'; }
-          if (ph) { ph.style.display = 'none'; }
+          if (img) {
+            img.src = pu;
+            img.onload = function() { img.style.display = 'block'; if (ph) { ph.style.display = 'none'; } };
+          }
           return;
         }
       } catch(e) {}
