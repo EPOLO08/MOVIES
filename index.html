@@ -232,7 +232,6 @@ html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sa
   <select class="fsel" id="f-country" onchange="applyFilters()"><option value="">Países</option></select>
   <select class="fsel" id="f-decade" onchange="applyFilters()"><option value="">Décadas</option></select>
   <select class="fsel" id="f-genre" onchange="applyFilters()"><option value="">Géneros</option></select>
-  <select class="fsel" id="f-stream" onchange="applyFilters()"><option value="">Dónde ver</option></select>
   <div style="display:flex;gap:5px">
     <button class="fbtn on" id="fb-all" onclick="setSF('all')">Todas</button>
     <button class="fbtn" id="fb-seen" onclick="setSF('seen')">Vistas</button>
@@ -931,112 +930,6 @@ var list500 = [
   {id:'m500',title:'Girlhood',year:2014,dir:'Celine Sciamma',country:'Francia',genre:'Drama',stream:'MUBI'}
 ];
 /* ============================================================
-   POSTER PRE-CACHE — paths reales de TMDB, sin búsqueda
-   ============================================================ */
-var POSTERS = {
-  't1':'/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg',
-  't2':'/tAgV9yxY6AC1bsPt3qJJQpD4s8.jpg',
-  't3':'/zv7J85D8CC9qYagAEhPM63CIG6j.jpg',
-  't4':'/hZmsRLsCnE9Zshf1YJONUpCOhds.jpg',
-  't5':'/ugmakEL5y294I5bXgiBqApuZpwc.jpg',
-  't6':'/sav0jxhqiH0bPr2vZFU0Kjt2nZL.jpg',
-  't7':'/g2YbTYKpY7N2yDSk7BfXZ18I5QV.jpg',
-  't8':'/lOMGc8bnSwQhS4XyE1S99uH8NXf.jpg',
-  't9':'/dZ2v0DAX4aCZartCzZdg4ZinSW2.jpg',
-  't10':'/23VIf7zNxAgaXwIlvzd3IvOd9sY.jpg',
-  't11':'/1qhOyf5C4s9ZdvY8d5JDx9DFMeT.jpg',
-  't12':'/zU1FLiGJw3m3iFrakwA0SzFvIPV.jpg',
-  't13':'/8JOzt7uFZyshcuzCBmYU6CDJL4D.jpg',
-  't14':'/iPdVqIpmR3bRvOQJPrn4pr2KR3q.jpg',
-  't15':'/iyTD2QnySNMPUPE3IedZQipSWfz.jpg',
-  't16':'/wcZ21zrOsy0b52AfAF50XpTiv75.jpg',
-  't17':'/9Wx0Wdn2EOqeCZU4SP6tlS3LOml.jpg',
-  't18':'/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg',
-  't19':'/vL7Xw04nFMHwnvXRFCmYYAzMUvY.jpg',
-  't20':'/jUihkn16SwPPIjuOyo6orHWUep6.jpg',
-  't21':'/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
-  't22':'/x7A59t6ySylr1L7aubOQEA480vM.jpg',
-  't23':'/mYPuSx5JwL8AdTwS1iQW4Un1cYP.jpg',
-  't24':'/rnbW5VtVxVQVx9ad70SuMbU0Biv.jpg',
-  't25':'/AttDP5OEsMxtHPPN7Z92p2Ntnmd.jpg',
-  't26':'/mR8dSQZI8X6Z1NClJhFrtJp636z.jpg',
-  't27':'/m9HG2N9ZKCmNN9qOHJTNyy18wn3.jpg',
-  't28':'/frZj5djlU9hFEjMcL21RJZVuG5O.jpg',
-  't29':'/3l8fOAwiN3N5n3hHnZ51eog7Zu2.jpg',
-  't30':'/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg',
-  't31':'/jcgUjx1QcupGzjntTVlnQ15lHqy.jpg',
-  't32':'/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
-  't33':'/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg',
-  't34':'/fa0RDkAlCec0STeMNAhPaF89q6U.jpg',
-  't35':'/l8cwuB5WJSoj4uMAsnzuHBOMaSJ.jpg',
-  't36':'/fVA5hTcAOlW2LJyelViQfWHxUcx.jpg',
-  't37':'/vTzjRi0Uhy0tt3Rjw8SARZZJHlX.jpg',
-  't38':'/54dlnGDexrwAFlDb8HWKfmmX4LB.jpg',
-  't39':'/bTdZk3q2DWpBRnLiaaItKFWOVhI.jpg',
-  't40':'/xQadpnoLokxzN3hRpCPbBGpxsiz.jpg',
-  't41':'/zN4ILX2x64PvT2jIOAHXxCOi5WA.jpg',
-  't42':'/kS7i093sQpkLTawUEdgf4HVOHSc.jpg',
-  't43':'/qNbMsKVzigERgJUbwf8pKyZogpb.jpg',
-  't44':'/k9tv1rXZbOhH7eiCk378x61kNQ1.jpg',
-  't45':'/2p3AFtOHFvP6OeVMqlnL1zLKOqL.jpg',
-  't46':'/kQOrS0DLUXYsqPMedM2G6NJcJBq.jpg',
-  't47':'/A0byHUHMwZ7dtBQtfZ44QIgDbjo.jpg',
-  't48':'/q8jlA3Wc1Z987hNKRFA44g5OugC.jpg',
-  't49':'/6v1zYh2FKOYVddY5pCQhd4PO9uX.jpg',
-  't50':'/33wsWxzsNstI8N7dvuwzFmj1qBd.jpg',
-  't51':'/riSUxwoK3xjkOgy6YJSvPhi7cO6.jpg',
-  't52':'/r8RiuKTIYIJBjczBVsfeP5C00CJ.jpg',
-  't53':'/cOBsWxFtEoqXIPx4JZP5E7g1WEo.jpg',
-  't54':'/iNtRSY2AGjW1VDXDR79bKsNUdus.jpg',
-  't55':'/5V9jDm4u2QemGHbqjUyP5HmFmzf.jpg',
-  't56':'/7uoiKOEjxBBW0AgDGQWrlfGQ90w.jpg',
-  't57':'/kr9wXRN23zLuWJIelahas1mtnYj.jpg',
-  't58':'/2ZmVbnecEeGoZCimxMhpY0Nz7eh.jpg',
-  't59':'/o6pUTkoCh4r6EA2dHNFKA40OmH2.jpg',
-  't60':'/oelBStY4xpguaplRv15P3Za7Xsr.jpg',
-  't61':'/2KFfwiPct1hwqi9dkKqoom0BenC.jpg',
-  't62':'/5ySa1aQaT7kMcAbKwlS1HXxp2hM.jpg',
-  't63':'/cITZsSQ7VG122xQ0xAN3NHZF0OH.jpg',
-  't64':'/kxpvceDv9fhFc4OAs82fmdzu17Y.jpg',
-  't65':'/wDxrEssdjFWYwIZLbr06RQNcg1q.jpg',
-  't66':'/sp5B7Tz5ttsgOLnIlCP5uEhtesI.jpg',
-  't67':'/3jfkdJTw5b6uVrp1rdrV4FHEvGg.jpg',
-  't68':'/zt8aQ6ksqK6p1AopC5zVTDS9pKT.jpg',
-  't69':'/ILVF0eJxHMddjxeQhswFtpMtqx.jpg',
-  't70':'/15uOEfqBNTVtDUT7hGBVCka0rZz.jpg',
-  't71':'/rUSjbyvYWN9H4az8xt0tDtU7I6v.jpg',
-  't72':'/6EJ4JoTxnH1QmGTE9pPzgtW1cLW.jpg',
-  't73':'/5I7SYsNQmZRZpQ2MAarIQYU9vaX.jpg',
-  't74':'/ijGV4v8JxgbNzgEhqKdzHdaZn8a.jpg',
-  't75':'/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg',
-  't76':'/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg',
-  't77':'/6IdCTKi4Eu7i897jpe59wIDGCri.jpg',
-  't78':'/2kSElneXSKmMsGL55k0CbPGqLbu.jpg',
-  't79':'/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg',
-  't80':'/z7xXihu5wHuSMWymq5VAulPVuvg.jpg',
-  't81':'/rUDuOKpkKBHxx41BScqKej72iT3.jpg',
-  't82':'/63rmSDPahrH7C1gEFYzRuIBAN9W.jpg',
-  't83':'/kZRSP3FmOcq0xnBulqpUQngJUXY.jpg',
-  't84':'/rVNYZZgfhwqVMMWlBmxOfWqnwCj.jpg',
-  't85':'/yvwF7dfSCybFcBOklUzKpE46bHM.jpg',
-  't86':'/4bx6Wceii1OZf0e3qp4EurUFoK7.jpg',
-  't87':'/rx8RKXn8OtuS6lqloYsjyrGOUp4.jpg',
-  't88':'/ix3pquGqTkCW86UbVTdRcrhGEFm.jpg',
-  't89':'/soBvtCR33Gv1j6gXwXOIc3JTlNc.jpg',
-  't90':'/8sxMhdn3i1Pn8OlGCBBjr9rjP1y.jpg',
-  't91':'/t3Lmw8jvm7tpik0lSkub8hU4oRW.jpg',
-  't92':'/kPFkC9EBvllCIuDTR7A0DSEK6gJ.jpg',
-  't93':'/jIv3EiZIC2tkBmjQ747Lyf5c61b.jpg',
-  't94':'/fcgRKfCRudyWggyHIT9LOPgU3qW.jpg',
-  't95':'/k7eYdWvhYQyRQoU2TB2A2Xu2TfD.jpg',
-  't96':'/kXiF80o74fE9gf3Utf9moAI7ar0.jpg',
-  't97':'/a2lxHS6Au35k5XtFQEQW44yWHeH.jpg',
-  't98':'/hUu9zyZmDd8VZegKi1iK1Vk0RYS.jpg',
-  't99':'/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg',
-  't100':'/7seqaCaaXDNUHOx4DqwpoOH8pPa.jpg'
-};
-
-/* ============================================================
    DATOS CURIOSOS PRE-ESCRITOS
    ============================================================ */
 var FACTS = {
@@ -1218,7 +1111,6 @@ function getF() {
     country: document.getElementById('f-country').value,
     decade: document.getElementById('f-decade').value,
     genre: document.getElementById('f-genre').value,
-    stream: document.getElementById('f-stream').value,
     status: sf
   };
 }
@@ -1243,7 +1135,6 @@ function matches(m, f) {
   if (f.country && m.country.indexOf(f.country) === -1) { return false; }
   if (f.decade && decade(m.year) !== parseInt(f.decade)) { return false; }
   if (f.genre && m.genre.indexOf(f.genre) === -1) { return false; }
-  if (f.stream && m.stream.indexOf(f.stream) === -1) { return false; }
   if (f.status === 'seen' && watched[m.id] !== true) { return false; }
   if (f.status === 'unseen' && watched[m.id] === true) { return false; }
   return true;
@@ -1262,7 +1153,7 @@ function applyFilters() {
 
 function buildFilterSelects() {
   var list = getCurrent();
-  var countries = {}, decades = {}, genres = {}, streams = {};
+  var countries = {}, decades = {}, genres = {};
   var i, j, p, parts;
   for (i = 0; i < list.length; i++) {
     var m = list[i];
@@ -1271,7 +1162,6 @@ function buildFilterSelects() {
     decades[decade(m.year)] = 1;
     parts = m.genre.split(' / ');
     for (j = 0; j < parts.length; j++) { p = parts[j].trim(); if (p) { genres[p] = 1; } }
-    if (m.stream) { streams[m.stream] = 1; }
   }
   var ch = '<option value="">Países</option>';
   var ca = Object.keys(countries).sort();
@@ -1285,10 +1175,6 @@ function buildFilterSelects() {
   var ga = Object.keys(genres).sort();
   for (i = 0; i < ga.length; i++) { gh += '<option value="' + esc(ga[i]) + '">' + esc(ga[i]) + '</option>'; }
   document.getElementById('f-genre').innerHTML = gh;
-  var sh = '<option value="">Dónde ver</option>';
-  var sa = Object.keys(streams).sort();
-  for (i = 0; i < sa.length; i++) { sh += '<option value="' + esc(sa[i]) + '">' + esc(sa[i]) + '</option>'; }
-  document.getElementById('f-stream').innerHTML = sh;
 }
 
 /* ============================================================
@@ -1315,18 +1201,9 @@ function setupObs() {
 }
 
 function loadPoster(mid, title, year, domSuffix) {
-  /* 1. Already cached */
   if (posterCache[mid] === 'none') { showPh(domSuffix, title, year); return; }
   if (posterCache[mid]) { showImg(domSuffix, posterCache[mid]); return; }
-  /* 2. Pre-baked poster path — instant, no API call */
-  if (POSTERS[mid]) {
-    var pu = 'https://image.tmdb.org/t/p/w342' + POSTERS[mid];
-    posterCache[mid] = pu;
-    showImg(domSuffix, pu);
-    return;
-  }
-  /* 3. Fallback: search by title (for list500 films) */
-  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB + '&query=' + encodeURIComponent(title) + '&year=' + year + '&language=en-US';
+  var url = 'https://api.themoviedb.org/3/search/movie?api_key=' + TMDB + '&query=' + encodeURIComponent(title) + '&year=' + year + '&language=es-ES';
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.onreadystatechange = function() {
@@ -1336,17 +1213,21 @@ function loadPoster(mid, title, year, domSuffix) {
     if (xhr.status === 200) {
       try {
         var d = JSON.parse(xhr.responseText);
-        if (d.results && d.results.length > 0 && d.results[0].poster_path) {
-          var pu2 = 'https://image.tmdb.org/t/p/w342' + d.results[0].poster_path;
-          posterCache[mid] = pu2;
-          if (d.results[0].overview && !synCache[mid]) { synCache[mid] = d.results[0].overview; }
-          showImg(domSuffix, pu2);
-          return;
+        if (d.results && d.results.length > 0) {
+          var r = d.results[0];
+          if (r.poster_path) {
+            var pu = 'https://image.tmdb.org/t/p/w300' + r.poster_path;
+            posterCache[mid] = pu;
+            if (r.overview && !synCache[mid]) { synCache[mid] = r.overview; }
+            showImg(domSuffix, pu);
+            return;
+          }
+          if (r.overview && !synCache[mid]) { synCache[mid] = r.overview; }
         }
       } catch(e) {}
     }
-    posterCache[mid] = 'none';
-    showPh(domSuffix, title, year);
+    /* Try English if no poster */
+    if (!posterCache[mid]) { loadPosterEn(mid, title, year, domSuffix); }
   };
   xhr.send();
 }
